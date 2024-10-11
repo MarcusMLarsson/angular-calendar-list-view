@@ -95,7 +95,11 @@
     (eventTimesChanged)="eventTimesChanged($event)"
   >
   </mwl-calendar-day-view>
-  <mwl-calendar-list-view [events]="events" [viewDate]="viewDate">
+  <mwl-calendar-list-view
+    *ngSwitchCase="CalendarView.List"
+    [events]="events"
+    [viewDate]="viewDate"
+  >
   </mwl-calendar-list-view>
 </div>
 

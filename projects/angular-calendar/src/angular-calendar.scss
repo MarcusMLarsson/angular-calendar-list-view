@@ -1,10 +1,12 @@
 @import 'modules/month/calendar-month-view/calendar-month-view';
 @import 'modules/week/calendar-week-view/calendar-week-view';
 @import 'modules/day/calendar-day-view/calendar-day-view';
+@import 'modules/list/calendar-list-view/calendar-list-view';
 @import 'modules/common/calendar-tooltip/calendar-tooltip';
 
 @mixin cal-theme($overrides) {
   @include cal-month-view-theme($overrides);
   @include cal-week-view-theme($overrides);
   @include cal-tooltip-theme($overrides);
+  @include cal-list-view-theme($overrides);
 }

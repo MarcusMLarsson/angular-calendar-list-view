@@ -1,0 +1,58 @@
+@use 'sass:map';
+@import '../../../variables';
+
+@mixin cal-list-view-theme($overrides: ()) {
+  $theme: map.merge($cal-vars, $overrides);
+
+  .calendar-list-view {
+    padding: 10px;
+    background-color: map.get($theme, bg-primary);
+
+    .date-header {
+      font-size: 18px;
+      font-weight: bold;
+      margin-top: 20px;
+      color: map.get($theme, gray);
+      border-bottom: 2px solid map.get($theme, border-color);
+      padding-bottom: 5px;
+    }
+
+    ul {
+      list-style: none;
+      padding: 0;
+      margin: 0;
+
+      li {
+        padding: 10px;
+        margin-bottom: 10px;
+        background-color: map.get($theme, bg-secondary);
+        border: 1px solid map.get($theme, border-color);
+        border-radius: 5px;
+        transition: background-color 0.3s ease;
+
+        &:hover {
+          background-color: map.get($theme, bg-active);
+        }
+
+        .event-time {
+          font-size: 14px;
+          color: map.get($theme, gray);
+        }
+
+        .event-title {
+          font-size: 16px;
+          font-weight: bold;
+          margin: 5px 0;
+          color: map.get($theme, black);
+        }
+
+        .event-location {
+          font-size: 12px;
+          color: map.get($theme, gray);
+        }
+      }
+    }
+  }
+}
+
+@include cal-list-view-theme;

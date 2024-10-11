@@ -8,6 +8,7 @@
     "projects/angular-calendar/src/modules/week/calendar-week-view/calendar-week-view.component.ts",
     "projects/angular-calendar/src/modules/month/calendar-month.module.ts",
     "projects/angular-calendar/src/modules/month/calendar-month-view/calendar-month-view.component.ts",
+    "projects/angular-calendar/src/modules/list/calendar-list-view/calendar-list-view.component.ts",
     "projects/angular-calendar/src/modules/common/calendar-common.module.ts",
     "projects/angular-calendar/src/modules/common/calendar-date/calendar-date.pipe.ts",
     "projects/angular-calendar/src/modules/common/calendar-date-formatter/calendar-date-formatter.interface.ts",

@@ -23,7 +23,7 @@ import {
   endOfDay,
 } from 'date-fns';
 
-type CalendarPeriod = 'day' | 'week' | 'month';
+type CalendarPeriod = 'day' | 'week' | 'month' | 'list';
 
 function addPeriod(period: CalendarPeriod, date: Date, amount: number): Date {
   return {

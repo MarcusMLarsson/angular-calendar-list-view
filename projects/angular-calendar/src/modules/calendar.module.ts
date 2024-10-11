@@ -9,6 +9,7 @@ import {
 import { CalendarMonthModule } from './month/calendar-month.module';
 import { CalendarWeekModule } from './week/calendar-week.module';
 import { CalendarDayModule } from './day/calendar-day.module';
+import { CalendarListModule } from './list/calendar-list.module';
 import { CalendarUtils } from './common/calendar-utils/calendar-utils.provider';
 
 export * from './common/calendar-common.module';
@@ -37,12 +38,14 @@ export * from './day/calendar-day.module';
     CalendarMonthModule,
     CalendarWeekModule,
     CalendarDayModule,
+    CalendarListModule,
   ],
   exports: [
     CalendarCommonModule,
     CalendarMonthModule,
     CalendarWeekModule,
     CalendarDayModule,
+    CalendarListModule,
   ],
 })
 export class CalendarModule {

@@ -99,4 +99,11 @@ export class CalendarAngularDateFormatter
   public dayViewTitle({ date, locale }: DateFormatterParams): string {
     return formatDate(date, 'EEEE, MMMM d, y', locale);
   }
+
+  /**
+   * List view title
+   */
+  public listViewTitle({ date, locale }: DateFormatterParams): string {
+    return formatDate(date, 'MMMM y', locale);
+  }
 }

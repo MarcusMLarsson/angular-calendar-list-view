@@ -54,6 +54,13 @@
       >
         Day
       </div>
+      <div
+        class="btn btn-primary"
+        (click)="setView(CalendarView.List)"
+        [class.active]="view === CalendarView.List"
+      >
+        List
+      </div>
     </div>
   </div>
 </div>
@@ -88,6 +95,7 @@
     (eventTimesChanged)="eventTimesChanged($event)"
   >
   </mwl-calendar-day-view>
+  <mwl-calendar-list-view> </mwl-calendar-list-view>
 </div>
 
 <!-- Everything you see below is just for the demo, you don't need to include it in your app -->

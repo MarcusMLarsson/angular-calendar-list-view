@@ -22,7 +22,11 @@ import { DatePipe } from '@angular/common';
               eventClicked.emit({ sourceEvent: $event, event: event })
             "
           >
-            <strong>{{ event.title }}</strong> -
+            <span
+              class="event-color-circle"
+              [ngStyle]="{ 'background-color': event.color?.primary }"
+            ></span>
+            <strong class="event-title">{{ event.title }}</strong> -
             {{ event.start | date : 'shortTime' }} to
             {{ event.end | date : 'shortTime' }}
           </li>
@@ -56,6 +60,7 @@ export class CalendarListViewComponent implements OnChanges {
   ngOnChanges(changes: SimpleChanges): void {
     if (changes.events) {
       this.groupEventsByDate();
+      console.log(this.groupedEventsByDate);
     }
   }
 

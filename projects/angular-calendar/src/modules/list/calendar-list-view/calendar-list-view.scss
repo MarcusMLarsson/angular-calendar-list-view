@@ -29,6 +29,8 @@
         border: 1px solid map.get($theme, border-color);
         border-radius: 5px;
         transition: background-color 0.3s ease;
+        display: flex;
+        align-items: center;
 
         &:hover {
           background-color: map.get($theme, bg-active);
@@ -39,10 +41,19 @@
           color: map.get($theme, gray);
         }
 
+        .event-color-circle {
+          display: inline-block;
+          width: 10px;
+          height: 10px;
+          border-radius: 50%;
+          margin-right: 10px;
+          vertical-align: middle;
+        }
+
         .event-title {
           font-size: 16px;
           font-weight: bold;
-          margin: 5px 0;
+          margin-right: 5px;
           color: map.get($theme, black);
         }
 

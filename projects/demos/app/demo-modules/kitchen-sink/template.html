@@ -97,6 +97,7 @@
   </mwl-calendar-day-view>
   <mwl-calendar-list-view
     *ngSwitchCase="CalendarView.List"
+    (eventClicked)="handleEvent('Clicked', $event.event)"
     [events]="events"
     [viewDate]="viewDate"
   >

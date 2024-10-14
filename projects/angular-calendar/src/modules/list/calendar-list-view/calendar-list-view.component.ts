@@ -1,9 +1,10 @@
 import {
   Component,
   Input,
-  OnInit,
   OnChanges,
   SimpleChanges,
+  Output,
+  EventEmitter,
 } from '@angular/core';
 import { CalendarEvent } from 'calendar-utils';
 import { DatePipe } from '@angular/common';
@@ -15,7 +16,12 @@ import { DatePipe } from '@angular/common';
       <div *ngFor="let eventGroup of groupedEventsByDate">
         <h3>{{ eventGroup.dateLabel }}</h3>
         <ul>
-          <li *ngFor="let event of eventGroup.events">
+          <li
+            *ngFor="let event of eventGroup.events"
+            (mwlClick)="
+              eventClicked.emit({ sourceEvent: $event, event: event })
+            "
+          >
             <strong>{{ event.title }}</strong> -
             {{ event.start | date : 'shortTime' }} to
             {{ event.end | date : 'shortTime' }}
@@ -37,6 +43,11 @@ export class CalendarListViewComponent implements OnChanges {
    * An array of events to display on view
    */
   @Input() events: CalendarEvent[] = [];
+
+  @Output() eventClicked = new EventEmitter<{
+    event: CalendarEvent;
+    sourceEvent: MouseEvent | KeyboardEvent;
+  }>();
 
   groupedEventsByDate: { dateLabel: string; events: CalendarEvent[] }[] = [];
 

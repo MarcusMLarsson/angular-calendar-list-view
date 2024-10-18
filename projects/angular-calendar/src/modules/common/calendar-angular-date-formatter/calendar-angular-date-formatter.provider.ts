@@ -103,7 +103,25 @@ export class CalendarAngularDateFormatter
   /**
    * List view title
    */
-  public listViewTitle({ date, locale }: DateFormatterParams): string {
-    return formatDate(date, 'MMMM y', locale);
+  public listViewTitle({
+    date,
+    locale,
+    weekStartsOn,
+    excludeDays,
+    daysInWeek,
+  }: DateFormatterParams): string {
+    const { viewStart, viewEnd } = getWeekViewPeriod(
+      this.dateAdapter,
+      date,
+      weekStartsOn,
+      excludeDays,
+      daysInWeek
+    );
+    const format = (dateToFormat: Date, showYear: boolean) =>
+      formatDate(dateToFormat, 'MMM d' + (showYear ? ', yyyy' : ''), locale);
+    return `${format(
+      viewStart,
+      viewStart.getUTCFullYear() !== viewEnd.getUTCFullYear()
+    )} - ${format(viewEnd, true)}`;
   }
 }

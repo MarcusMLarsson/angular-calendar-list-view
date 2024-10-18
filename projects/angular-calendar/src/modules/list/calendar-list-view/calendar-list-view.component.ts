@@ -8,11 +8,16 @@ import {
 } from '@angular/core';
 import { CalendarEvent } from 'calendar-utils';
 import { DatePipe } from '@angular/common';
+import { DateAdapter, getWeekViewPeriod } from '../../calendar.module';
 
 @Component({
   selector: 'mwl-calendar-list-view',
   template: `
     <div class="calendar-list-view">
+      <div *ngIf="groupedEventsByDate.length === 0">
+        <p>No events for this period.</p>
+      </div>
+
       <div *ngFor="let eventGroup of groupedEventsByDate">
         <h3>{{ eventGroup.dateLabel }}</h3>
         <ul>
@@ -38,15 +43,10 @@ import { DatePipe } from '@angular/common';
   providers: [DatePipe],
 })
 export class CalendarListViewComponent implements OnChanges {
-  /**
-   * The current view date
-   */
   @Input() viewDate: Date;
-
-  /**
-   * An array of events to display on view
-   */
   @Input() events: CalendarEvent[] = [];
+  @Input() weekStartsOn: number;
+  @Input() excludeDays: number[] = [];
 
   @Output() eventClicked = new EventEmitter<{
     event: CalendarEvent;
@@ -55,12 +55,11 @@ export class CalendarListViewComponent implements OnChanges {
 
   groupedEventsByDate: { dateLabel: string; events: CalendarEvent[] }[] = [];
 
-  constructor(private datePipe: DatePipe) {}
+  constructor(private datePipe: DatePipe, protected dateAdapter: DateAdapter) {}
 
   ngOnChanges(changes: SimpleChanges): void {
-    if (changes.events) {
+    if (changes.events || changes.viewDate || changes.timeRange) {
       this.groupEventsByDate();
-      console.log(this.groupedEventsByDate);
     }
   }
 
@@ -71,13 +70,27 @@ export class CalendarListViewComponent implements OnChanges {
   private groupEventsByDate(): void {
     const grouped: { [key: string]: CalendarEvent[] } = {};
 
+    //  [dayStartHour]="dayStartHour"
+    //[dayEndHour]="dayEndHour"
+
+    const weekPeriod = getWeekViewPeriod(
+      this.dateAdapter,
+      this.viewDate,
+      this.weekStartsOn || 0,
+      this.excludeDays
+    );
+
+    const { viewStart, viewEnd } = weekPeriod;
+
     // Iterate through each event and group by date (without time)
     for (const event of this.events) {
-      const eventDate = this.datePipe.transform(event.start, 'yyyy-MM-dd');
-      if (!grouped[eventDate]) {
-        grouped[eventDate] = [];
+      if (event.start >= viewStart && event.start <= viewEnd) {
+        const eventDate = this.datePipe.transform(event.start, 'yyyy-MM-dd');
+        if (!grouped[eventDate]) {
+          grouped[eventDate] = [];
+        }
+        grouped[eventDate].push(event);
       }
-      grouped[eventDate].push(event);
     }
 
     // Convert the grouped object into an array with formatted date labels

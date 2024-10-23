@@ -8,6 +8,7 @@ import {
 import { DateAdapter } from '../../../date-adapters/date-adapter';
 import { CalendarView } from '../calendar-view/calendar-view.enum';
 import { addDaysWithExclusions } from '../util/util';
+import { ListView } from '../calendar-view/list-view.enum';
 
 /**
  * Change the view date to the previous view. For example:
@@ -29,6 +30,8 @@ export class CalendarPreviousViewDirective {
    * The current view
    */
   @Input() view: CalendarView | 'month' | 'week' | 'day' | 'list';
+
+  @Input() listView: ListView;
 
   /**
    * The current view date
@@ -83,15 +86,32 @@ export class CalendarPreviousViewDirective {
         )
       );
     } else if (this.view === CalendarView.List) {
-      this.daysInWeek = 7;
-      this.viewDateChange.emit(
-        addDaysWithExclusions(
-          this.dateAdapter,
-          this.viewDate,
-          -this.daysInWeek,
-          this.excludeDays
-        )
-      );
+      switch (this.listView) {
+        case ListView.Day:
+          this.viewDateChange.emit(
+            addDaysWithExclusions(
+              this.dateAdapter,
+              this.viewDate,
+              -1,
+              this.excludeDays
+            )
+          );
+          break;
+        case ListView.Week:
+          this.daysInWeek = 7;
+          this.viewDateChange.emit(
+            addDaysWithExclusions(
+              this.dateAdapter,
+              this.viewDate,
+              -this.daysInWeek,
+              this.excludeDays
+            )
+          );
+          break;
+        default: {
+          this.viewDateChange.emit(subFn(this.viewDate, 1));
+        }
+      }
     } else {
       this.viewDateChange.emit(subFn(this.viewDate, 1));
     }

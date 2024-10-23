@@ -23,6 +23,7 @@ import {
   CalendarView,
 } from 'angular-calendar';
 import { EventColor } from 'calendar-utils';
+import { ListView } from 'projects/angular-calendar/src/modules/common/calendar-view/list-view.enum';
 
 const colors: Record<string, EventColor> = {
   red: {
@@ -60,6 +61,7 @@ export class DemoComponent {
   @ViewChild('modalContent', { static: true }) modalContent: TemplateRef<any>;
 
   view: CalendarView = CalendarView.Month;
+  listView: ListView = ListView.Day;
 
   CalendarView = CalendarView;
 

@@ -61,7 +61,7 @@ export class DemoComponent {
   @ViewChild('modalContent', { static: true }) modalContent: TemplateRef<any>;
 
   view: CalendarView = CalendarView.Month;
-  listView: ListView = ListView.Day;
+  listView: ListView = ListView.Month;
 
   CalendarView = CalendarView;
 

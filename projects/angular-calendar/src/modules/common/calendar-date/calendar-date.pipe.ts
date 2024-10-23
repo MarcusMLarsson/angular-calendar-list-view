@@ -23,7 +23,8 @@ export class CalendarDatePipe implements PipeTransform {
     locale: string = this.locale,
     weekStartsOn: number = 0,
     excludeDays: number[] = [],
-    daysInWeek?: number
+    daysInWeek?: number,
+    listView?: string
   ): string {
     if (typeof this.dateFormatter[method] === 'undefined') {
       const allowedMethods = Object.getOwnPropertyNames(
@@ -41,6 +42,7 @@ export class CalendarDatePipe implements PipeTransform {
       weekStartsOn,
       excludeDays,
       daysInWeek,
+      listView,
     });
   }
 }

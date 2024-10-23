@@ -1,3 +1,5 @@
+import { ListView } from '../calendar-view/list-view.enum';
+
 /**
  * The parameter type passed to the date formatter methods.
  */
@@ -27,6 +29,8 @@ export interface DateFormatterParams {
    * The first day of the week will always be the `viewDate`
    */
   daysInWeek?: number;
+
+  listView?: ListView;
 }
 
 /**

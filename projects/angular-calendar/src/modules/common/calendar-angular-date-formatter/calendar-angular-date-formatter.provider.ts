@@ -6,6 +6,7 @@ import { formatDate } from '@angular/common';
 import { Injectable } from '@angular/core';
 import { DateAdapter } from '../../../date-adapters/date-adapter';
 import { getWeekViewPeriod } from '../util/util';
+import { ListView } from '../calendar-view/list-view.enum';
 
 /**
  * This will use the angular date pipe to do all date formatting. It is the default date formatter used by the calendar.
@@ -14,6 +15,7 @@ import { getWeekViewPeriod } from '../util/util';
 export class CalendarAngularDateFormatter
   implements CalendarDateFormatterInterface
 {
+  ListView: ListView;
   constructor(protected dateAdapter: DateAdapter) {}
 
   /**
@@ -109,19 +111,28 @@ export class CalendarAngularDateFormatter
     weekStartsOn,
     excludeDays,
     daysInWeek,
+    listView,
   }: DateFormatterParams): string {
-    const { viewStart, viewEnd } = getWeekViewPeriod(
-      this.dateAdapter,
-      date,
-      weekStartsOn,
-      excludeDays,
-      daysInWeek
-    );
-    const format = (dateToFormat: Date, showYear: boolean) =>
-      formatDate(dateToFormat, 'MMM d' + (showYear ? ', yyyy' : ''), locale);
-    return `${format(
-      viewStart,
-      viewStart.getUTCFullYear() !== viewEnd.getUTCFullYear()
-    )} - ${format(viewEnd, true)}`;
+    switch (listView) {
+      case ListView.Day:
+        return this.dayViewTitle({ date, locale });
+
+      case ListView.Week:
+        return this.weekViewTitle({
+          date,
+          locale,
+          weekStartsOn,
+          excludeDays,
+          daysInWeek,
+        });
+
+      case ListView.Month:
+        return this.monthViewTitle({ date, locale });
+
+      case ListView.All:
+        return 'Complete Event History';
+      default:
+        return;
+    }
   }
 }

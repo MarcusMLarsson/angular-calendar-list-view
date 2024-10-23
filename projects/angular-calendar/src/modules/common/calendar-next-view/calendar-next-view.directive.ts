@@ -108,6 +108,11 @@ export class CalendarNextViewDirective {
             )
           );
           break;
+        case ListView.Month:
+          this.viewDateChange.emit(
+            this.dateAdapter.addMonths(this.viewDate, 1)
+          );
+          break;
         default: {
           this.viewDateChange.emit(addFn(this.viewDate, 1));
         }

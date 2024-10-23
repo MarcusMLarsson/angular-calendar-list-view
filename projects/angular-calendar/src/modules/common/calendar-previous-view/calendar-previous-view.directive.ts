@@ -110,7 +110,7 @@ export class CalendarPreviousViewDirective {
           break;
         case ListView.Month:
           this.viewDateChange.emit(
-            this.dateAdapter.addMonths(this.viewDate, 1)
+            this.dateAdapter.subMonths(this.viewDate, 1)
           );
           break;
         default: {

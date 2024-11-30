@@ -1,0 +1,39 @@
+<div class="calendar-list-view">
+  <div class="scroll-container" #scrollContainer (scroll)="onScroll()">
+    <div
+      class="event-group-container"
+      *ngFor="let eventGroup of groupedEventsByDate"
+      [attr.id]="'date-' + eventGroup.dateLabel"
+    >
+      <!-- Period label -->
+      <h3 class="date-header">
+        {{ eventGroup.dateLabel }}
+      </h3>
+
+      <!-- No event for period -->
+      <div *ngIf="eventGroup.events.length === 0" class="no-events">
+        <span>No events for this period.</span>
+      </div>
+
+      <!-- There are events for this period  -->
+      <ul *ngIf="eventGroup.events.length > 0">
+        <li
+          [ngStyle]="{
+            color: event.color?.secondaryText,
+            backgroundColor: event.color?.secondary,
+            borderColor: event.color?.primary
+          }"
+          *ngFor="let event of eventGroup.events"
+          (click)="onEventClick(event, $event)"
+        >
+          <!-- Information inside each event  -->
+          <strong class="event-title">{{ event.title }}</strong>
+          <span>
+            {{ event.start | date : "shortTime" }} to
+            {{ event.end | date : "shortTime" }}
+          </span>
+        </li>
+      </ul>
+    </div>
+  </div>
+</div>

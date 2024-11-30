@@ -1,0 +1,25 @@
+.calendar-container {
+  display: flex;
+  flex-direction: column;
+  height: 100vh;
+  overflow: hidden;
+}
+
+app-date-picker {
+  flex-shrink: 0; /* Prevent shrinking */
+  width: 100%;
+  z-index: 10;
+  background-color: white;
+
+  /* Ensure the component takes its natural height */
+  .calendar-container {
+    overflow: visible;
+  }
+}
+
+app-list {
+  flex-grow: 1; /* Makes the list take up the remaining space */
+  overflow-y: auto; /* Allows scrolling if the list overflows */
+  background-color: #f4f4f4; /* Optional background color */
+  min-height: 0; /* Helps with flex layout in some browsers */
+}

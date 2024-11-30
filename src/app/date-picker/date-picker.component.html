@@ -1,0 +1,46 @@
+<div class="calendar-container">
+  <div class="calendar-header" (click)="toggleView()">
+    <span class="month-year">{{
+      datePipe.transform(viewDate, "MMMM yyyy")
+    }}</span>
+    <span class="toggle-icon">{{ isExpanded ? "▼" : "▲" }}</span>
+  </div>
+
+  <ng-container *ngIf="!isExpanded">
+    <!-- Week View -->
+    <div class="week-container">
+      <div class="week-view">
+        <div class="week-day" *ngFor="let day of getCurrentWeek()">
+          <div class="day-label">{{ getDayAbbreviation(day.date) }}</div>
+          <div
+            class="day-number"
+            [class.selected]="isSelectedDay(day.date)"
+            (click)="onDateClick(day.date)"
+          >
+            {{ day.dayNumber }}
+          </div>
+        </div>
+      </div>
+    </div>
+  </ng-container>
+
+  <ng-container *ngIf="isExpanded">
+    <!-- Month View -->
+    <div class="month-view">
+      <div class="day-labels">
+        <div *ngFor="let day of dayAbbreviations">{{ day }}</div>
+      </div>
+      <div class="week-row" *ngFor="let week of monthDays">
+        <div
+          class="month-day"
+          *ngFor="let day of week"
+          [class.selected]="isSelectedDay(day.date)"
+          [class.other-month]="!isSameMonth(day.date)"
+          (click)="onDateClick(day.date)"
+        >
+          {{ day.dayNumber }}
+        </div>
+      </div>
+    </div>
+  </ng-container>
+</div>

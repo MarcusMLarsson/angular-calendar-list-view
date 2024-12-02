@@ -1,10 +1,11 @@
 <div class="calendar-container">
   <app-date-picker [viewDate]="viewDate"></app-date-picker>
-  <div class="scroll-container" (scroll)="onScroll()">
-    <app-list
-      [viewDate]="viewDate"
-      [events]="events"
-      [listView]="listView"
-    ></app-list>
-  </div>
+
+  <app-list
+    class="scroll-container"
+    (scroll)="onScroll()"
+    [viewDate]="viewDate"
+    [events]="events"
+    [listView]="listView"
+  ></app-list>
 </div>

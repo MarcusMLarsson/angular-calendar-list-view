@@ -7,13 +7,14 @@
   </div>
 
   <ng-container *ngIf="!isExpanded">
-    <!-- Week View -->
     <div class="week-container">
       <div class="week-view">
-        <div class="week-day" *ngFor="let day of getCurrentWeek()">
-          <div class="day-label">{{ getDayAbbreviation(day.date) }}</div>
+        <div *ngFor="let day of getCurrentWeek()">
+          <div class="day-label-week-view">
+            {{ getDayAbbreviation(day.date) }}
+          </div>
           <div
-            class="day-number"
+            class="day-of-the-week"
             [class.selected]="isSelectedDay(day.date)"
             (click)="onDateClick(day.date)"
           >
@@ -25,20 +26,22 @@
   </ng-container>
 
   <ng-container *ngIf="isExpanded">
-    <!-- Month View -->
-    <div class="month-view">
-      <div class="day-labels">
+    <div class="month-container">
+      <div class="day-label-month-view">
         <div *ngFor="let day of dayAbbreviations">{{ day }}</div>
       </div>
       <div class="week-row" *ngFor="let week of monthDays">
         <div
-          class="month-day"
+          class="day-of-the-month"
           *ngFor="let day of week"
-          [class.selected]="isSelectedDay(day.date)"
-          [class.other-month]="!isSameMonth(day.date)"
           (click)="onDateClick(day.date)"
         >
-          {{ day.dayNumber }}
+          <div
+            [class.selected]="isSelectedDay(day.date)"
+            [class.other-month]="!isSameMonth(day.date)"
+          >
+            {{ day.dayNumber }}
+          </div>
         </div>
       </div>
     </div>

@@ -5,21 +5,21 @@
   overflow: hidden;
 }
 
+.scroll-container {
+  flex-grow: 1;
+  overflow-y: auto;
+  min-height: 0;
+  background-color: #f4f4f4;
+}
+
 app-date-picker {
-  flex-shrink: 0; /* Prevent shrinking */
+  flex-shrink: 0;
   width: 100%;
   z-index: 10;
   background-color: white;
-
-  /* Ensure the component takes its natural height */
-  .calendar-container {
-    overflow: visible;
-  }
 }
 
 app-list {
-  flex-grow: 1; /* Makes the list take up the remaining space */
-  overflow-y: auto; /* Allows scrolling if the list overflows */
-  background-color: #f4f4f4; /* Optional background color */
-  min-height: 0; /* Helps with flex layout in some browsers */
+  display: block;
+  width: 100%;
 }

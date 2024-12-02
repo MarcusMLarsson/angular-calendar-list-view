@@ -126,6 +126,7 @@ export class DatePickerComponent implements OnInit {
   /*
    * Returns true if the given date is the selected date *
    * Used to highlight the selected date in blue *
+   * TODO: this method is triggered to many times, optimize it *
    */
   isSelectedDay(date: Date): boolean {
     return (
@@ -149,6 +150,7 @@ export class DatePickerComponent implements OnInit {
    * Sets the selected date to the clicked date *
    */
   onDateClick(date: Date): void {
+    console.log('onDateCLicked');
     this.calendarListStateService.setDayPickerSelectedDate(date);
   }
 }

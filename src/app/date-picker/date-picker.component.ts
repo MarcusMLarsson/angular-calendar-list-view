@@ -25,6 +25,8 @@ export class DatePickerComponent implements OnInit {
   weekStartsOn: Day | undefined;
   @Input() viewDate: Date = new Date();
 
+  currentWeek: Array<{ date: Date; dayNumber: number }> = [];
+
   private destroyRef = inject(DestroyRef);
 
   constructor(
@@ -33,6 +35,7 @@ export class DatePickerComponent implements OnInit {
   ) {}
 
   ngOnInit() {
+    this.currentWeek = this.getCurrentWeek();
     this.generateDayInitials();
     this.generateMonthDays();
 
@@ -150,7 +153,6 @@ export class DatePickerComponent implements OnInit {
    * Sets the selected date to the clicked date *
    */
   onDateClick(date: Date): void {
-    console.log('onDateCLicked');
     this.calendarListStateService.setDayPickerSelectedDate(date);
   }
 }

@@ -7,6 +7,7 @@ import { DemoComponent } from './demo/demo.component';
 import { ListComponent } from './list/list.component';
 import { DatePickerComponent } from './date-picker/date-picker.component';
 import { DatePipe, CommonModule } from '@angular/common';
+import { IsSelectedDayPipe } from './pipes/is-selected-day.pipe';
 
 @NgModule({
   declarations: [
@@ -14,6 +15,7 @@ import { DatePipe, CommonModule } from '@angular/common';
     DemoComponent,
     ListComponent,
     DatePickerComponent,
+    IsSelectedDayPipe,
   ],
   imports: [BrowserModule, AppRoutingModule, CommonModule],
   providers: [DatePipe],

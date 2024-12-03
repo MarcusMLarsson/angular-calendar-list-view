@@ -9,13 +9,13 @@
   <ng-container *ngIf="!isExpanded">
     <div class="week-container">
       <div class="week-view">
-        <div *ngFor="let day of getCurrentWeek()">
+        <div *ngFor="let day of currentWeek">
           <div class="day-label-week-view">
             {{ getDayAbbreviation(day.date) }}
           </div>
           <div
             class="day-of-the-week"
-            [class.selected]="isSelectedDay(day.date)"
+            [class.selected]="day.date | isSelectedDay : selectedDate"
             (click)="onDateClick(day.date)"
           >
             {{ day.dayNumber }}
@@ -37,7 +37,7 @@
           (click)="onDateClick(day.date)"
         >
           <div
-            [class.selected]="isSelectedDay(day.date)"
+            [class.selected]="day.date | isSelectedDay : selectedDate"
             [class.other-month]="!isSameMonth(day.date)"
           >
             {{ day.dayNumber }}

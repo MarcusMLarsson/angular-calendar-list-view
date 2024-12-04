@@ -1,16 +1,19 @@
 <div class="calendar-container">
-  <div class="calendar-header-container" (click)="toggleView()">
-    <!-- Week header -->
-    <span class="calendar-header" *ngIf="!isExpanded">
-      {{ viewDate | weekNumber }}, {{ viewDate | date : "MMMM yyyy" }}
-    </span>
-
-    <!-- Month header -->
-    <span class="calendar-header" *ngIf="isExpanded">
-      {{ viewDate | date : "MMMM yyyy" }}
-    </span>
-
-    <span class="toggle-icon">{{ isExpanded ? "▼" : "▲" }}</span>
+  <div class="calendar-header-container">
+    <div class="stepper-container">
+      <div class="material-icons">chevron_left</div>
+      <span class="calendar-header">
+        {{
+          isExpanded
+            ? (viewDate | date : "MMMM yyyy")
+            : (viewDate | weekNumber) + ", " + (viewDate | date : "yyyy")
+        }}
+      </span>
+      <div class="material-icons">chevron_right</div>
+    </div>
+    <span class="toggle-icon" (click)="toggleView()">{{
+      isExpanded ? "▼" : "▲"
+    }}</span>
   </div>
 
   <!-- Week view -->

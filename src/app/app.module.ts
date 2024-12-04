@@ -9,6 +9,8 @@ import { DatePickerComponent } from './date-picker/date-picker.component';
 import { DatePipe } from '@angular/common';
 import { IsSelectedDayPipe } from './pipes/is-selected-day/is-selected-day.pipe';
 import { WeekNumberPipe } from './pipes/week-number/week-number.pipe';
+import { MatIconModule } from '@angular/material/icon';
+import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 
 @NgModule({
   declarations: [
@@ -19,7 +21,7 @@ import { WeekNumberPipe } from './pipes/week-number/week-number.pipe';
     IsSelectedDayPipe,
     WeekNumberPipe,
   ],
-  imports: [BrowserModule, AppRoutingModule],
+  imports: [BrowserModule, AppRoutingModule, MatIconModule, BrowserAnimationsModule],
   providers: [DatePipe],
   bootstrap: [AppComponent],
 })

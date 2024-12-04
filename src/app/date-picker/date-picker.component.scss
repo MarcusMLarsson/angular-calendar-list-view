@@ -30,6 +30,12 @@
   }
 }
 
+.stepper-container {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+}
+
 .week-container,
 .month-container {
   padding: 8px;

@@ -8,6 +8,10 @@ import {
   startOfMonth,
   endOfMonth,
   endOfWeek,
+  addWeeks,
+  subWeeks,
+  addMonths,
+  subMonths,
 } from 'date-fns';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 
@@ -154,5 +158,58 @@ export class DatePickerComponent implements OnInit {
    */
   onDateClick(date: Date): void {
     this.calendarListStateService.setDayPickerSelectedDate(date);
+  }
+
+  goToPreviousStep(isExpanded: boolean): void {
+    if (isExpanded) {
+      this.viewDate = subMonths(this.viewDate, 1);
+      this.updateCurrentMonth();
+    } else {
+      this.viewDate = subWeeks(this.viewDate, 1);
+      this.updateCurrentWeek();
+    }
+  }
+
+  goToNextStep(isExpanded: boolean): void {
+    if (isExpanded) {
+      this.viewDate = addMonths(this.viewDate, 1);
+      this.updateCurrentMonth();
+    } else {
+      this.viewDate = addWeeks(this.viewDate, 1);
+      this.updateCurrentWeek();
+    }
+  }
+
+  updateCurrentWeek(): void {
+    this.currentWeek = this.getCurrentWeek();
+  }
+
+  updateCurrentMonth() {
+    const start = startOfMonth(this.viewDate);
+    const end = endOfMonth(this.viewDate);
+    const startDate = startOfWeek(start, {
+      weekStartsOn: this.weekStartsOn || 0,
+    });
+    const endDate = endOfWeek(end, { weekStartsOn: this.weekStartsOn || 0 });
+
+    let date = startDate;
+    const weeks: Array<Array<{ date: Date; dayNumber: number }>> = [];
+    let week: Array<{ date: Date; dayNumber: number }> = [];
+
+    while (date <= endDate) {
+      week.push({
+        date: new Date(date),
+        dayNumber: date.getDate(),
+      });
+
+      if (week.length === 7) {
+        weeks.push(week);
+        week = [];
+      }
+
+      date = addDays(date, 1);
+    }
+
+    this.monthDays = weeks;
   }
 }

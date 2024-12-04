@@ -1,7 +1,9 @@
 <div class="calendar-container">
   <div class="calendar-header-container">
     <div class="stepper-container">
-      <div class="material-icons">chevron_left</div>
+      <div class="material-icons" (click)="goToPreviousStep(isExpanded)">
+        chevron_left
+      </div>
       <span class="calendar-header">
         {{
           isExpanded
@@ -9,7 +11,9 @@
             : (viewDate | weekNumber) + ", " + (viewDate | date : "yyyy")
         }}
       </span>
-      <div class="material-icons">chevron_right</div>
+      <div class="material-icons" (click)="goToNextStep(isExpanded)">
+        chevron_right
+      </div>
     </div>
     <span class="toggle-icon" (click)="toggleView()">{{
       isExpanded ? "▼" : "▲"

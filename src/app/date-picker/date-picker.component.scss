@@ -5,7 +5,7 @@
   background-color: white;
 }
 
-.calendar-header {
+.calendar-header-container {
   display: flex;
   justify-content: space-between;
   align-items: center;
@@ -18,7 +18,7 @@
     background-color: #f0f0f0;
   }
 
-  .month-year {
+  .calendar-header {
     font-weight: 600;
     color: #333;
     font-size: 16px;

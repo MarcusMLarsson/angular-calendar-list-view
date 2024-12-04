@@ -1,11 +1,19 @@
 <div class="calendar-container">
-  <div class="calendar-header" (click)="toggleView()">
-    <span class="month-year">{{
-      datePipe.transform(viewDate, "MMMM yyyy")
-    }}</span>
+  <div class="calendar-header-container" (click)="toggleView()">
+    <!-- Week header -->
+    <span class="calendar-header" *ngIf="!isExpanded">
+      {{ viewDate | weekNumber }}, {{ viewDate | date : "MMMM yyyy" }}
+    </span>
+
+    <!-- Month header -->
+    <span class="calendar-header" *ngIf="isExpanded">
+      {{ viewDate | date : "MMMM yyyy" }}
+    </span>
+
     <span class="toggle-icon">{{ isExpanded ? "▼" : "▲" }}</span>
   </div>
 
+  <!-- Week view -->
   <ng-container *ngIf="!isExpanded">
     <div class="week-container">
       <div class="week-view">
@@ -25,6 +33,7 @@
     </div>
   </ng-container>
 
+  <!-- Month view -->
   <ng-container *ngIf="isExpanded">
     <div class="month-container">
       <div class="day-label-month-view">

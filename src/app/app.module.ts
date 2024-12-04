@@ -6,8 +6,9 @@ import { AppComponent } from './app.component';
 import { DemoComponent } from './demo/demo.component';
 import { ListComponent } from './list/list.component';
 import { DatePickerComponent } from './date-picker/date-picker.component';
-import { DatePipe, CommonModule } from '@angular/common';
-import { IsSelectedDayPipe } from './pipes/is-selected-day.pipe';
+import { DatePipe } from '@angular/common';
+import { IsSelectedDayPipe } from './pipes/is-selected-day/is-selected-day.pipe';
+import { WeekNumberPipe } from './pipes/week-number/week-number.pipe';
 
 @NgModule({
   declarations: [
@@ -16,8 +17,9 @@ import { IsSelectedDayPipe } from './pipes/is-selected-day.pipe';
     ListComponent,
     DatePickerComponent,
     IsSelectedDayPipe,
+    WeekNumberPipe,
   ],
-  imports: [BrowserModule, AppRoutingModule, CommonModule],
+  imports: [BrowserModule, AppRoutingModule],
   providers: [DatePipe],
   bootstrap: [AppComponent],
 })

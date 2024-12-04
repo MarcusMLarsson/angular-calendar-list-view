@@ -85,6 +85,11 @@ export class DemoComponent {
     return null;
   }
 
+  openAddEventDialog() {
+    // Implement logic to open your event creation dialog or form
+    console.log('Open Add Event Dialog');
+  }
+
   ngOnInit() {
     // Hide parent scrollbar
     document.body.style.overflow = 'hidden';

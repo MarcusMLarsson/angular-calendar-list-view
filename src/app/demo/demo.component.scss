@@ -24,3 +24,24 @@ app-list {
   display: block;
   width: 100%;
 }
+
+.add-event-button {
+  position: absolute;
+  bottom: 20px;
+  right: 20px;
+  width: 56px;
+  height: 56px;
+  border-radius: 50%;
+  background-color: #2778d5; /* Your chosen blue color */
+  color: white;
+  font-size: 36px; /* Icon size adjustment */
+  border: none;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+  z-index: 20;
+  cursor: pointer;
+  transition: background-color 0.3s;
+  box-shadow: 0 6px 12px rgba(0, 0, 0, 0.3);
+}

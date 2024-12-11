@@ -6,7 +6,6 @@ import { Pipe, PipeTransform } from '@angular/core';
 })
 export class IsSelectedDayPipe implements PipeTransform {
   transform(date: Date, selectedDate: Date): boolean {
-    console.log('HELLO');
     return (
       selectedDate &&
       date.getDate() === selectedDate.getDate() &&

@@ -1,62 +1,30 @@
-import { Component, DestroyRef, Input, OnInit, inject } from '@angular/core';
+import { Component, Input, Output, EventEmitter } from '@angular/core';
 import { DatePipe } from '@angular/common';
 import { StateService } from '../service/state.service';
-import {
-  Day,
-  startOfWeek,
-  addDays,
-  startOfMonth,
-  endOfMonth,
-  endOfWeek,
-  addWeeks,
-  subWeeks,
-  addMonths,
-  subMonths,
-} from 'date-fns';
-import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 
 @Component({
   selector: 'app-date-picker',
   templateUrl: './date-picker.component.html',
   styleUrls: ['./date-picker.component.scss'],
 })
-export class DatePickerComponent implements OnInit {
-  dayAbbreviations: string[] = [];
-  monthDays: Array<Array<{ date: Date; dayNumber: number }>> = [];
-  selectedDate!: Date;
-  isExpanded: boolean = false;
-
-  weekStartsOn: Day | undefined;
+export class DatePickerComponent {
+  @Input() dayAbbreviations!: string[];
+  @Input() monthDays!: Array<Array<{ date: Date; dayNumber: number }>>;
+  @Input() dayPickerSelectedDate!: Date;
   @Input() viewDate: Date = new Date();
 
-  currentWeek: Array<{ date: Date; dayNumber: number }> = [];
+  @Input() currentWeek!: Array<{ date: Date; dayNumber: number }>;
+  @Output() changeStep = new EventEmitter<{
+    step: 'next' | 'previous';
+    isExpanded: boolean;
+  }>();
 
-  private destroyRef = inject(DestroyRef);
+  isExpanded: boolean = false;
 
   constructor(
     public datePipe: DatePipe,
     private calendarListStateService: StateService
   ) {}
-
-  ngOnInit() {
-    this.currentWeek = this.getCurrentWeek();
-    this.generateDayInitials();
-    this.generateMonthDays();
-
-    // listens to when the user select a day in the day picker
-    this.calendarListStateService.dayPickerSelectedDate$
-      .pipe(takeUntilDestroyed(this.destroyRef))
-      .subscribe((date: Date) => {
-        this.selectedDate = date;
-      });
-
-    // listens to when the user scrolls in the list
-    this.calendarListStateService.listViewScrolledDate$
-      .pipe(takeUntilDestroyed(this.destroyRef))
-      .subscribe((date: Date) => {
-        this.selectedDate = date;
-      });
-  }
 
   /*
    * Expands or contract the day picker  *
@@ -70,78 +38,6 @@ export class DatePickerComponent implements OnInit {
    */
   getDayAbbreviation(date: Date): string {
     return this.datePipe.transform(date, 'EEE') || '';
-  }
-
-  private generateDayInitials(): void {
-    const weekStart = startOfWeek(this.viewDate, {
-      weekStartsOn: this.weekStartsOn,
-    });
-    this.dayAbbreviations = Array.from({ length: 7 }, (_, i) => {
-      const day = addDays(weekStart, i);
-      return this.datePipe.transform(day, 'EEE') || '';
-    });
-  }
-
-  private generateMonthDays(): void {
-    const start = startOfMonth(this.viewDate);
-    const end = endOfMonth(this.viewDate);
-    const startDate = startOfWeek(start, {
-      weekStartsOn: this.weekStartsOn || 0,
-    });
-    const endDate = endOfWeek(end, {
-      weekStartsOn: this.weekStartsOn || 0,
-    });
-
-    let date = startDate;
-    const weeks: Array<Array<{ date: Date; dayNumber: number }>> = [];
-    let week: Array<{ date: Date; dayNumber: number }> = [];
-
-    while (date <= endDate) {
-      week.push({
-        date: new Date(date),
-        dayNumber: date.getDate(),
-      });
-
-      if (week.length === 7) {
-        weeks.push(week);
-        week = [];
-      }
-
-      date = addDays(date, 1);
-    }
-
-    this.monthDays = weeks;
-  }
-
-  /*
-   *  generates an array representing the days of the current week based on the viewDate *
-   */
-  getCurrentWeek(): Array<{ date: Date; dayNumber: number }> {
-    const currentWeekStart = startOfWeek(this.viewDate, {
-      weekStartsOn: this.weekStartsOn || 0,
-    });
-
-    return Array.from({ length: 7 }, (_, dayIndex) => {
-      const date = addDays(currentWeekStart, dayIndex);
-      return {
-        date,
-        dayNumber: date.getDate(),
-      };
-    });
-  }
-
-  /*
-   * Returns true if the given date is the selected date *
-   * Used to highlight the selected date in blue *
-   * TODO: this method is triggered to many times, optimize it *
-   */
-  isSelectedDay(date: Date): boolean {
-    return (
-      this.selectedDate &&
-      date.getDate() === this.selectedDate.getDate() &&
-      date.getMonth() === this.selectedDate.getMonth() &&
-      date.getFullYear() === this.selectedDate.getFullYear()
-    );
   }
 
   /*
@@ -161,55 +57,10 @@ export class DatePickerComponent implements OnInit {
   }
 
   goToPreviousStep(isExpanded: boolean): void {
-    if (isExpanded) {
-      this.viewDate = subMonths(this.viewDate, 1);
-      this.updateCurrentMonth();
-    } else {
-      this.viewDate = subWeeks(this.viewDate, 1);
-      this.updateCurrentWeek();
-    }
+    this.changeStep.emit({ step: 'previous', isExpanded });
   }
 
   goToNextStep(isExpanded: boolean): void {
-    if (isExpanded) {
-      this.viewDate = addMonths(this.viewDate, 1);
-      this.updateCurrentMonth();
-    } else {
-      this.viewDate = addWeeks(this.viewDate, 1);
-      this.updateCurrentWeek();
-    }
-  }
-
-  updateCurrentWeek(): void {
-    this.currentWeek = this.getCurrentWeek();
-  }
-
-  updateCurrentMonth() {
-    const start = startOfMonth(this.viewDate);
-    const end = endOfMonth(this.viewDate);
-    const startDate = startOfWeek(start, {
-      weekStartsOn: this.weekStartsOn || 0,
-    });
-    const endDate = endOfWeek(end, { weekStartsOn: this.weekStartsOn || 0 });
-
-    let date = startDate;
-    const weeks: Array<Array<{ date: Date; dayNumber: number }>> = [];
-    let week: Array<{ date: Date; dayNumber: number }> = [];
-
-    while (date <= endDate) {
-      week.push({
-        date: new Date(date),
-        dayNumber: date.getDate(),
-      });
-
-      if (week.length === 7) {
-        weeks.push(week);
-        week = [];
-      }
-
-      date = addDays(date, 1);
-    }
-
-    this.monthDays = weeks;
+    this.changeStep.emit({ step: 'next', isExpanded });
   }
 }

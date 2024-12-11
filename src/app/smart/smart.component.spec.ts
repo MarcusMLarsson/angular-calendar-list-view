@@ -1,16 +1,16 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 
-import { DemoComponent } from './demo.component';
+import { SmartComponent } from './smart.component';
 
-describe('DemoComponent', () => {
-  let component: DemoComponent;
-  let fixture: ComponentFixture<DemoComponent>;
+describe('SmartComponent', () => {
+  let component: SmartComponent;
+  let fixture: ComponentFixture<SmartComponent>;
 
   beforeEach(() => {
     TestBed.configureTestingModule({
-      declarations: [DemoComponent]
+      declarations: [SmartComponent],
     });
-    fixture = TestBed.createComponent(DemoComponent);
+    fixture = TestBed.createComponent(SmartComponent);
     component = fixture.componentInstance;
     fixture.detectChanges();
   });

@@ -30,7 +30,7 @@
           </div>
           <div
             class="day-of-the-week"
-            [class.selected]="day.date | isSelectedDay : selectedDate"
+            [class.selected]="day.date | isSelectedDay : dayPickerSelectedDate"
             (click)="onDateClick(day.date)"
           >
             {{ day.dayNumber }}
@@ -53,7 +53,7 @@
           (click)="onDateClick(day.date)"
         >
           <div
-            [class.selected]="day.date | isSelectedDay : selectedDate"
+            [class.selected]="day.date | isSelectedDay : dayPickerSelectedDate"
             [class.other-month]="!isSameMonth(day.date)"
           >
             {{ day.dayNumber }}

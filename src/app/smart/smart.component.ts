@@ -269,7 +269,7 @@ export class SmartComponent implements OnChanges, OnInit, AfterViewInit {
       // Scroll the element into view with an offset (for the header)
       // block: 'start' option ensures the element scrolls to the top of the container.
       dateElement.scrollIntoView({
-        behavior: 'smooth',
+        behavior: 'instant',
         block: 'start',
         inline: 'nearest',
       });

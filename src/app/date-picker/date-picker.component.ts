@@ -8,18 +8,20 @@ import { StateService } from '../service/state.service';
   styleUrls: ['./date-picker.component.scss'],
 })
 export class DatePickerComponent {
-  @Input() dayAbbreviations!: string[];
-  @Input() monthDays!: Array<Array<{ date: Date; dayNumber: number }>>;
+  @Input() dayOfWeekAbbreviations!: string[];
+  @Input() currentMonthDays!: Array<Array<{ date: Date; dayNumber: number }>>;
   @Input() dayPickerSelectedDate!: Date;
   @Input() viewDate: Date = new Date();
 
-  @Input() currentWeek!: Array<{ date: Date; dayNumber: number }>;
+  @Input() currentWeekDays!: Array<{ date: Date; dayNumber: number }>;
   @Output() changeStep = new EventEmitter<{
     step: 'next' | 'previous';
-    isExpanded: boolean;
+    dayPickerViewMode: 'week' | 'month';
   }>();
 
-  isExpanded: boolean = false;
+  @Output() viewModeChange = new EventEmitter<'week' | 'month'>();
+
+  dayPickerViewMode: 'week' | 'month' = 'week';
 
   constructor(
     public datePipe: DatePipe,
@@ -30,7 +32,10 @@ export class DatePickerComponent {
    * Expands or contract the day picker  *
    */
   toggleView() {
-    this.isExpanded = !this.isExpanded;
+    this.dayPickerViewMode =
+      this.dayPickerViewMode === 'week' ? 'month' : 'week';
+
+    this.viewModeChange.emit(this.dayPickerViewMode);
   }
 
   /*
@@ -56,11 +61,11 @@ export class DatePickerComponent {
     this.calendarListStateService.setDayPickerSelectedDate(date);
   }
 
-  goToPreviousStep(isExpanded: boolean): void {
-    this.changeStep.emit({ step: 'previous', isExpanded });
+  goToPreviousStep(dayPickerViewMode: 'week' | 'month'): void {
+    this.changeStep.emit({ step: 'previous', dayPickerViewMode });
   }
 
-  goToNextStep(isExpanded: boolean): void {
-    this.changeStep.emit({ step: 'next', isExpanded });
+  goToNextStep(dayPickerViewMode: 'week' | 'month'): void {
+    this.changeStep.emit({ step: 'next', dayPickerViewMode });
   }
 }

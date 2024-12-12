@@ -2,10 +2,11 @@
   <app-date-picker
     [viewDate]="viewDate"
     [dayPickerSelectedDate]="dayPickerSelectedDate"
-    [dayAbbreviations]="dayAbbreviations"
-    [currentWeek]="currentWeek"
-    [monthDays]="monthDays"
+    [dayOfWeekAbbreviations]="dayOfWeekAbbreviations"
+    [currentWeekDays]="currentWeekDays"
+    [currentMonthDays]="currentMonthDays"
     (changeStep)="onChangeStep($event)"
+    (viewModeChange)="onViewModeChange($event)"
   ></app-date-picker>
 
   <app-list

@@ -1,30 +1,30 @@
 <div class="calendar-container">
   <div class="calendar-header-container">
     <div class="stepper-container">
-      <div class="material-icons" (click)="goToPreviousStep(isExpanded)">
+      <div class="material-icons" (click)="goToPreviousStep(dayPickerViewMode)">
         chevron_left
       </div>
       <span class="calendar-header">
         {{
-          isExpanded
+          dayPickerViewMode === "month"
             ? (viewDate | date : "MMMM yyyy")
             : (viewDate | weekNumber) + ", " + (viewDate | date : "yyyy")
         }}
       </span>
-      <div class="material-icons" (click)="goToNextStep(isExpanded)">
+      <div class="material-icons" (click)="goToNextStep(dayPickerViewMode)">
         chevron_right
       </div>
     </div>
     <span class="toggle-icon" (click)="toggleView()">{{
-      isExpanded ? "▼" : "▲"
+      dayPickerViewMode === "month" ? "▼" : "▲"
     }}</span>
   </div>
 
   <!-- Week view -->
-  <ng-container *ngIf="!isExpanded">
+  <ng-container *ngIf="dayPickerViewMode === 'week'">
     <div class="week-container">
       <div class="week-view">
-        <div *ngFor="let day of currentWeek">
+        <div *ngFor="let day of currentWeekDays">
           <div class="day-label-week-view">
             {{ getDayAbbreviation(day.date) }}
           </div>
@@ -41,12 +41,12 @@
   </ng-container>
 
   <!-- Month view -->
-  <ng-container *ngIf="isExpanded">
+  <ng-container *ngIf="dayPickerViewMode === 'month'">
     <div class="month-container">
       <div class="day-label-month-view">
-        <div *ngFor="let day of dayAbbreviations">{{ day }}</div>
+        <div *ngFor="let day of dayOfWeekAbbreviations">{{ day }}</div>
       </div>
-      <div class="week-row" *ngFor="let week of monthDays">
+      <div class="week-row" *ngFor="let week of currentMonthDays">
         <div
           class="day-of-the-month"
           *ngFor="let day of week"

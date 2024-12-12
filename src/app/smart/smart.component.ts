@@ -4,6 +4,10 @@ import {
   DestroyRef,
   SimpleChanges,
   ChangeDetectorRef,
+  OnChanges,
+  OnInit,
+  OnDestroy,
+  AfterViewInit,
 } from '@angular/core';
 import { StateService } from '../service/state.service';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
@@ -30,7 +34,9 @@ import { EventGroupingService } from '../service/event-grouping.service';
   templateUrl: './smart.component.html',
   styleUrls: ['./smart.component.scss'],
 })
-export class SmartComponent {
+export class SmartComponent
+  implements OnChanges, OnInit, OnDestroy, AfterViewInit
+{
   viewDate: Date = new Date();
   listView = ListView.Day;
 
@@ -60,7 +66,7 @@ export class SmartComponent {
   constructor(
     private calendarListStateService: StateService,
     private datePipe: DatePipe,
-    private cdRef: ChangeDetectorRef,
+    private cdr: ChangeDetectorRef,
     private eventGroupingService: EventGroupingService
   ) {
     // listens to when the user scrolls in the list
@@ -123,14 +129,31 @@ export class SmartComponent {
         break;
       }
     }
+
+    if (scrollableContainer.scrollTop === 0) {
+      const currentOffset =
+        scrollableContainer.scrollHeight - scrollableContainer.scrollTop;
+
+      // Call the loadMoreEvents function
+      this.loadMoreEvents('previous');
+
+      // Use ChangeDetectorRef to ensure DOM updates are processed
+      this.cdr.detectChanges();
+
+      scrollableContainer.scrollTop =
+        scrollableContainer.scrollHeight - currentOffset;
+    } else if (
+      scrollableContainer.scrollHeight - scrollableContainer.scrollTop ===
+      scrollableContainer.clientHeight
+    ) {
+      // Scrolled to the bottom - Load next events
+      this.loadMoreEvents('next');
+    }
   }
 
-  /**
-   * Loads more dates at the top or bottom of the list
-   */
-  // Function to handle appending/prepending data
   loadMoreEvents(append: 'previous' | 'next'): void {
-    // Get the grouped events based on the current view and date
+    const maxItems = 150;
+
     const newGroupedEvents = this.eventGroupingService.groupEventsByDate(
       this.events,
       this.listView,
@@ -139,17 +162,27 @@ export class SmartComponent {
     );
 
     if (append === 'previous') {
-      // Prepend the new data to the beginning of the existing events
+      this.viewDate = subMonths(this.viewDate, 1);
       this.groupedEventsByDate = [
         ...newGroupedEvents,
         ...this.groupedEventsByDate,
       ];
+
+      // Trim excess items
+      if (this.groupedEventsByDate.length > maxItems) {
+        this.groupedEventsByDate = this.groupedEventsByDate.slice(0, maxItems);
+      }
     } else if (append === 'next') {
-      // Append the new data to the end of the existing events
+      this.viewDate = addMonths(this.viewDate, 1);
       this.groupedEventsByDate = [
         ...this.groupedEventsByDate,
         ...newGroupedEvents,
       ];
+
+      // Trim excess items
+      if (this.groupedEventsByDate.length > maxItems) {
+        this.groupedEventsByDate = this.groupedEventsByDate.slice(-maxItems);
+      }
     }
   }
 
@@ -175,9 +208,14 @@ export class SmartComponent {
     this.currentWeek = this.getCurrentWeek();
     this.generateMonthDays();
     this.generateDayInitials();
+  }
 
-    this.loadMoreEvents('previous');
-    this.loadMoreEvents('next');
+  ngAfterViewInit(): void {
+    const scrollableContainer = document.querySelector('.scroll-container');
+
+    if (scrollableContainer) {
+      scrollableContainer.scrollTop = 5; // Set the initial scroll position slightly down
+    }
   }
 
   ngOnChanges(changes: SimpleChanges): void {

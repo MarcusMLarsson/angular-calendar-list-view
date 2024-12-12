@@ -130,6 +130,8 @@ export class SmartComponent implements OnChanges, OnInit, AfterViewInit {
           this.listView,
           this.viewDate
         );
+
+        this.cdr.detectChanges();
         this.scrollToSelectedDate();
       });
   }
@@ -249,9 +251,10 @@ export class SmartComponent implements OnChanges, OnInit, AfterViewInit {
    */
   private scrollToSelectedDate(): void {
     // Format the selected date to match the date label in the list view
+    // date format needs to match the date label in the list view
     const formattedSelectedDateLabel = this.datePipe.transform(
       this.dayPickerSelectedDate,
-      'EEEE, MMMM d'
+      'MMM d, y'
     );
 
     // Find the DOM element that matches the selected date label
@@ -328,14 +331,14 @@ export class SmartComponent implements OnChanges, OnInit, AfterViewInit {
       event.dayPickerViewMode
     );
 
-    if (event.dayPickerViewMode) {
-      // Generate month if expanded
+    if (event.dayPickerViewMode === 'month') {
+      // Generate new month view when stepping
       this.currentMonthDays = this.datePickerService.generateMonth(
         this.viewDate,
         0
       );
-    } else {
-      // Generate week if not expanded
+    } else if (event.dayPickerViewMode === 'week') {
+      // Generate new week view when stepping
       this.currentWeekDays = this.datePickerService.getWeekDays(
         this.viewDate,
         0

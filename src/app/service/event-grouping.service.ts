@@ -5,7 +5,7 @@ import { ListView, CalendarEvent } from '../utils/utils';
 
 // Constants for date formats
 const DATE_FORMATS = {
-  DAY: 'EEEE, MMMM d',
+  DAY: 'MMM d, y',
   MONTH: 'MMMM yyyy',
 } as const;
 

@@ -59,6 +59,24 @@ export const events: CalendarEvent[] = [
   {
     title: 'An  event',
     color: colors.yellow,
+    start: new Date(new Date().setDate(new Date().getDate() - 35)),
+    end: new Date(new Date().setDate(new Date().getDate() - 35)),
+  },
+  {
+    title: 'An  event',
+    color: colors.yellow,
+    start: new Date(new Date().setDate(new Date().getDate() - 34)),
+    end: new Date(new Date().setDate(new Date().getDate() - 34)),
+  },
+  {
+    title: 'An  event',
+    color: colors.yellow,
+    start: new Date(new Date().setDate(new Date().getDate() - 33)),
+    end: new Date(new Date().setDate(new Date().getDate() - 33)),
+  },
+  {
+    title: 'An  event',
+    color: colors.yellow,
     start: new Date(new Date().setDate(new Date().getDate() - 6)),
     end: new Date(new Date().setDate(new Date().getDate() - 6)),
   },

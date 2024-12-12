@@ -8,19 +8,14 @@
     (changeStep)="onChangeStep($event)"
   ></app-date-picker>
 
-  <cdk-virtual-scroll-viewport
+  <app-list
     class="scroll-container"
-    itemSize="50"
-    (scrolledIndexChange)="onScroll($event)"
-  >
-    <app-list
-      class="scroll-container"
-      [viewDate]="viewDate"
-      [events]="events"
-      [listView]="listView"
-      [groupedEventsByDate]="groupedEventsByDate"
-    ></app-list>
-  </cdk-virtual-scroll-viewport>
+    (scroll)="onScroll()"
+    [viewDate]="viewDate"
+    [events]="events"
+    [listView]="listView"
+    [groupedEventsByDate]="groupedEventsByDate"
+  ></app-list>
 
   <button class="add-event-button" (click)="openAddEventDialog()">
     <mat-icon>add</mat-icon>

@@ -39,13 +39,6 @@ export class DatePickerComponent {
   }
 
   /*
-   * Returns the day abbreviation for the given date *
-   */
-  getDayAbbreviation(date: Date): string {
-    return this.datePipe.transform(date, 'EEE') || '';
-  }
-
-  /*
    * Returns true if the given date is in the same month as the view date *
    * Used to highlight the selected date in blue *
    */

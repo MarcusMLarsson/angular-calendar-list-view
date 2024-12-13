@@ -15,9 +15,13 @@
         chevron_right
       </div>
     </div>
-    <span class="toggle-icon" (click)="toggleView()">{{
-      dayPickerViewMode === "month" ? "▼" : "▲"
-    }}</span>
+    <span class="toggle-icon" (click)="toggleView()">
+      <mat-icon>{{
+        dayPickerViewMode === "month"
+          ? "keyboard_arrow_down"
+          : "keyboard_arrow_up"
+      }}</mat-icon>
+    </span>
   </div>
 
   <!-- Week view -->
@@ -26,7 +30,7 @@
       <div class="week-view">
         <div *ngFor="let day of currentWeekDays">
           <div class="day-label-week-view">
-            {{ getDayAbbreviation(day.date) }}
+            {{ dayOfWeekAbbreviations[day.date.getDay()] }}
           </div>
           <div
             class="day-of-the-week"

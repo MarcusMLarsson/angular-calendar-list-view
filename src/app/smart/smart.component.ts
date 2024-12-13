@@ -278,15 +278,16 @@ export class SmartComponent implements OnChanges, OnInit, AfterViewInit {
 
     const listViewContainer = document.querySelector('.scroll-container');
 
-    console.log(dateElement);
-    console.log(listViewContainer);
-
+    // fallback is needed when the dates in the datepicker are outside the current view
     if (!dateElement) {
       console.log('fallback');
-
-      this.loadMoreEvents('previous');
-
-      this.cdr.detectChanges();
+      if (this.dayPickerSelectedDate.getDate() > 15) {
+        this.loadMoreEvents('previous');
+        this.cdr.detectChanges();
+      } else {
+        this.loadMoreEvents('next');
+        this.cdr.detectChanges();
+      }
 
       const dateElement = document.getElementById(
         'date-' + formattedSelectedDateLabel
@@ -323,7 +324,7 @@ export class SmartComponent implements OnChanges, OnInit, AfterViewInit {
    */
   loadMoreEvents(append: 'previous' | 'next'): void {
     // Limit the number of items in the list view
-    const maxItems = 150;
+    const maxItems = 200;
 
     const newGroupedEvents = this.eventGroupingService.groupEventsByDate(
       this.events,

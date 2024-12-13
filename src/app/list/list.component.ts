@@ -33,7 +33,7 @@ export class ListComponent {
   }>();
 
   @Input() groupedEventsByDate!: {
-    dateLabel: string;
+    dateLabel: Date;
     events: CalendarEvent[];
   }[];
 

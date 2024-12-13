@@ -1,16 +1,29 @@
 .calendar-list-view {
   background-color: #fff;
 
-  .date-header {
+  .date-header-container {
+    display: flex;
+    justify-content: flex-start;
+    align-items: start;
     position: sticky;
+    z-index: 1;
     top: -1px;
+    margin-top: 0px;
+    margin-bottom: 5px;
+    flex-direction: column;
+    background-color: #fff;
+  }
+
+  .date-header {
     font-size: 18px;
     font-weight: bold;
-    color: #555;
     background-color: #fff;
-    z-index: 1;
-    box-shadow: 0 1px 0 rgb(0 0 0 / 10%);
-    margin-top: 0px;
+  }
+
+  .date-sub-header {
+    font-size: 14px;
+    color: #333;
+    background-color: #fff;
   }
 
   ul {
@@ -26,7 +39,7 @@
       display: flex;
       align-items: flex-start;
       flex-direction: column;
-      box-shadow: 0 2px 5px rgb(0 0 0 / 20%);
+      box-shadow: 0 1px 0 rgb(0 0 0 / 10%);
 
       &:hover {
         background-color: #ededed;

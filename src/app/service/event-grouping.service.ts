@@ -3,12 +3,6 @@ import { getISOWeek } from 'date-fns';
 import { DatePipe } from '@angular/common';
 import { ListView, CalendarEvent } from '../utils/utils';
 
-// Constants for date formats
-const DATE_FORMATS = {
-  DAY: 'MMM d, y',
-  MONTH: 'MMMM yyyy',
-} as const;
-
 @Injectable({
   providedIn: 'root',
 })
@@ -28,17 +22,83 @@ export class EventGroupingService {
     listView: ListView,
     viewDate: Date,
     append: 'previous' | 'next' | 'none' = 'none'
-  ): { dateLabel: string; events: CalendarEvent[] }[] {
+  ): { dateLabel: Date; events: CalendarEvent[] }[] {
     // Generate labels for the current view
     const labels = this.getLabelsForCurrentView(listView, viewDate, append);
 
     // Map labels to their corresponding events
     return labels.map((label) => ({
       dateLabel: label,
-      events: events.filter(
-        (event) => this.getDateLabel(event.start, listView) === label
+      events: events.filter((event) =>
+        this.isEventInLabel(event, label, listView)
       ),
     }));
+  }
+
+  /**
+   * Check if an event belongs to a specific date label based on list view
+   * @param event Calendar event to check
+   * @param label Date label to match against
+   * @param listView Current list view mode
+   * @returns Boolean indicating if event matches the label
+   */
+  private isEventInLabel(
+    event: CalendarEvent,
+    label: Date,
+    listView: ListView
+  ): boolean {
+    switch (listView) {
+      case ListView.Day:
+        return this.isSameDay(event.start, label);
+      case ListView.Week:
+        return this.isEventInWeek(event.start, label);
+      case ListView.Month:
+        return this.isSameMonth(event.start, label);
+      default:
+        return false;
+    }
+  }
+
+  /**
+   * Check if two dates are on the same day
+   * @param date1 First date
+   * @param date2 Second date
+   * @returns Boolean indicating if dates are on the same day
+   */
+  private isSameDay(date1: Date, date2: Date): boolean {
+    return (
+      date1.getFullYear() === date2.getFullYear() &&
+      date1.getMonth() === date2.getMonth() &&
+      date1.getDate() === date2.getDate()
+    );
+  }
+
+  /**
+   * Check if an event falls within the same week as the label
+   * @param eventDate Date of the event
+   * @param weekLabel Week label date
+   * @returns Boolean indicating if event is in the same week
+   */
+  private isEventInWeek(eventDate: Date, weekLabel: Date): boolean {
+    const eventYear = eventDate.getFullYear();
+    const eventWeek = getISOWeek(eventDate);
+    const labelWeek = getISOWeek(weekLabel);
+    const labelYear = weekLabel.getFullYear();
+
+    return eventYear === labelYear && eventWeek === labelWeek;
+  }
+
+  /**
+   * Check if two dates are in the same month
+   * @param date1 First date
+   * @param date2 Second date
+   * @returns Boolean indicating if dates are in the same month
+   */
+  private isSameMonth(date1: Date, date2: Date): boolean {
+    return (
+      date1.getFullYear() === date2.getFullYear() &&
+      date1.getMonth() === date2.getMonth()
+    );
   }
 
   /**
@@ -52,7 +112,7 @@ export class EventGroupingService {
     listView: ListView,
     viewDate: Date,
     append: 'previous' | 'next' | 'none'
-  ): string[] {
+  ): Date[] {
     switch (listView) {
       case ListView.Day:
         return this.generateDailyLabels(viewDate, append);
@@ -74,13 +134,11 @@ export class EventGroupingService {
   private generateDailyLabels(
     viewDate: Date,
     append: 'previous' | 'next' | 'none' = 'none'
-  ): string[] {
-    // Determine the target month
+  ): Date[] {
     const targetStartDate = this.getTargetDate(viewDate, append);
-    const labels: string[] = [];
+    const labels: Date[] = [];
 
-    // Generate labels for each day in the target month
-    const currentDate = new Date(targetStartDate);
+    let currentDate = new Date(targetStartDate);
     const lastDay = new Date(
       currentDate.getFullYear(),
       currentDate.getMonth() + 1,
@@ -88,10 +146,7 @@ export class EventGroupingService {
     );
 
     while (currentDate <= lastDay) {
-      const dateLabel = this.datePipe.transform(currentDate, DATE_FORMATS.DAY);
-      if (dateLabel) {
-        labels.push(dateLabel);
-      }
+      labels.push(new Date(currentDate));
       currentDate.setDate(currentDate.getDate() + 1);
     }
 
@@ -107,20 +162,25 @@ export class EventGroupingService {
   private generateWeekLabels(
     viewDate: Date,
     append: 'previous' | 'next' | 'none' = 'none'
-  ): string[] {
-    // Determine the target year
+  ): Date[] {
     const targetYear = this.getTargetYear(viewDate, append);
-    const labels: string[] = [];
+    const labels: Date[] = [];
 
-    // Generate week labels for the target year
-    const firstDay = new Date(targetYear, 0, 1);
-    let currentDate = new Date(firstDay);
+    let currentDate = new Date(viewDate);
 
-    while (currentDate.getFullYear() === targetYear) {
-      const weekLabel = `W${getISOWeek(currentDate)}`;
-      labels.push(weekLabel);
+    // Adjust to the start of the week (Monday)
+    while (currentDate.getDay() !== 1) {
+      currentDate.setDate(currentDate.getDate() - 1);
+    }
 
-      // Move to next week
+    // Reset to the first day of the week for the target year
+    currentDate.setFullYear(targetYear);
+
+    // Generate week labels for the entire year
+    const endOfYear = new Date(targetYear, 11, 31);
+
+    while (currentDate <= endOfYear) {
+      labels.push(new Date(currentDate));
       currentDate.setDate(currentDate.getDate() + 7);
     }
 
@@ -136,32 +196,9 @@ export class EventGroupingService {
   private generateMonthLabels(
     viewDate: Date,
     append: 'previous' | 'next' | 'none' = 'none'
-  ): string[] {
-    // Determine the target month
+  ): Date[] {
     const targetDate = this.getTargetDate(viewDate, append);
-
-    // Generate month label
-    const monthLabel = this.datePipe.transform(targetDate, DATE_FORMATS.MONTH);
-    return monthLabel ? [monthLabel] : [];
-  }
-
-  /**
-   * Get appropriate date label based on list view
-   * @param date Event date
-   * @param listView Current list view mode
-   * @returns Formatted date label
-   */
-  private getDateLabel(date: Date, listView: ListView): string {
-    switch (listView) {
-      case ListView.Day:
-        return this.datePipe.transform(date, DATE_FORMATS.DAY) as string;
-      case ListView.Week:
-        return `W${getISOWeek(date)}`;
-      case ListView.Month:
-        return this.datePipe.transform(date, DATE_FORMATS.MONTH) as string;
-      default:
-        return '';
-    }
+    return [new Date(targetDate)];
   }
 
   /**

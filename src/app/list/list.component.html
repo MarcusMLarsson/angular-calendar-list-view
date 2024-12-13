@@ -2,12 +2,40 @@
   <div
     class="event-group-container"
     *ngFor="let eventGroup of groupedEventsByDate"
-    [attr.id]="'date-' + eventGroup.dateLabel"
+    [attr.id]="'date-' + (eventGroup.dateLabel | date : 'yyyy-MM-dd')"
   >
     <!-- Period label -->
-    <h3 class="date-header">
-      {{ eventGroup.dateLabel }}
-    </h3>
+    <div class="date-header-container">
+      <ng-container *ngIf="listView === 'day'">
+        <span class="date-header">
+          {{ eventGroup.dateLabel | date : "EEEE d" }}
+        </span>
+
+        <span class="date-sub-header">
+          {{ eventGroup.dateLabel | date : "MMM YYYY" }}
+        </span>
+      </ng-container>
+
+      <ng-container *ngIf="listView === 'week'">
+        <span class="date-header">
+          {{ eventGroup.dateLabel | weekNumber }}
+        </span>
+
+        <span class="date-sub-header">
+          {{ eventGroup.dateLabel | date : "MMM YYYY" }}
+        </span>
+      </ng-container>
+
+      <ng-container *ngIf="listView === 'month'">
+        <span class="date-header">
+          {{ eventGroup.dateLabel | date : "MMMM" }}
+        </span>
+
+        <span class="date-sub-header">
+          {{ eventGroup.dateLabel | date : "YYYY" }}
+        </span>
+      </ng-container>
+    </div>
 
     <!-- No event for period -->
     <div *ngIf="eventGroup.events.length === 0" class="no-events">

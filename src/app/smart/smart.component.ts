@@ -11,7 +11,7 @@ import {
 import { StateService } from '../service/state.service';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { events, ListView, CalendarEvent } from '../utils/utils';
-import { Day, subMonths, addMonths } from 'date-fns';
+import { Day, subMonths, addMonths, parse } from 'date-fns';
 import { DatePipe } from '@angular/common';
 import { EventGroupingService } from '../service/event-grouping.service';
 import { DatePickerService } from '../service/date-picker.service';
@@ -47,7 +47,7 @@ export class SmartComponent implements OnChanges, OnInit, AfterViewInit {
    * The list of events grouped by date
    * grouped according to the listView
    */
-  groupedEventsByDate: { dateLabel: string; events: CalendarEvent[] }[] = [];
+  groupedEventsByDate: { dateLabel: Date; events: CalendarEvent[] }[] = [];
 
   /*
    * The current week days displayed in the day picker when not expanded
@@ -188,38 +188,40 @@ export class SmartComponent implements OnChanges, OnInit, AfterViewInit {
    */
   onScroll(): void {
     const scrollableContainer = document.querySelector('.scroll-container');
-    // Get the position the the scrollable container element relative to the viewport
-    const containerPosition = scrollableContainer?.getBoundingClientRect();
-
     if (!scrollableContainer) return;
 
-    const dateHeaderElements =
-      scrollableContainer.querySelectorAll('.date-header');
+    const containerPosition = scrollableContainer.getBoundingClientRect();
 
-    for (let i = 0; i < dateHeaderElements.length; i++) {
-      const dateHeader = dateHeaderElements[i] as HTMLElement;
+    // Select all date header containers
+    const dateHeaderContainers = scrollableContainer.querySelectorAll(
+      '.date-header-container'
+    );
 
-      // Get the position the current date header element relative to the viewport
-      const headerPosition = dateHeader.getBoundingClientRect();
+    for (let i = 0; i < dateHeaderContainers.length; i++) {
+      const dateHeaderContainer = dateHeaderContainers[i] as HTMLElement;
 
-      // Check if the bottom of the current header is greater than or equal to the top of the scrollable container
-      // This means the header is still within view and hasn't been scrolled past the top of the container
-      if (
-        containerPosition &&
-        dateHeader.textContent &&
-        headerPosition.bottom >= containerPosition.top
-      ) {
-        const dateLabel = dateHeader.textContent.trim();
+      // Get position of the current header container
+      const headerPosition = dateHeaderContainer.getBoundingClientRect();
 
-        const parsedDate = new Date(
-          `${dateLabel} ${this.dayPickerSelectedDate.getFullYear()}`
-        );
+      if (containerPosition && headerPosition.bottom >= containerPosition.top) {
+        // Extract weekday and month-year text from the container
+        const weekdayHeader = dateHeaderContainer
+          .querySelector('.date-header')
+          ?.textContent?.trim();
+        const monthYearHeader = dateHeaderContainer
+          .querySelector('.date-sub-header')
+          ?.textContent?.trim();
 
-        // Updates the dayPickerSelectedDate in the list view based on the scroll position
-        if (parsedDate) {
-          this.calendarListStateService.setListViewScrolledDate(parsedDate);
+        if (weekdayHeader && monthYearHeader) {
+          // Combine the weekday and month-year parts into a full date string
+          const fullDateString = `${weekdayHeader} ${monthYearHeader}`;
+
+          const parsedDate = new Date(fullDateString);
+
+          if (parsedDate) {
+            this.calendarListStateService.setListViewScrolledDate(parsedDate);
+          }
         }
-
         break;
       }
     }
@@ -254,13 +256,15 @@ export class SmartComponent implements OnChanges, OnInit, AfterViewInit {
     // date format needs to match the date label in the list view
     const formattedSelectedDateLabel = this.datePipe.transform(
       this.dayPickerSelectedDate,
-      'MMM d, y'
+      'yyyy-MM-dd'
     );
 
     // Find the DOM element that matches the selected date label
     const dateElement = document.getElementById(
       'date-' + formattedSelectedDateLabel
     );
+
+    console.log(dateElement);
 
     // Get reference to the scroll container
     const listViewContainer = document.querySelector('.scroll-container');

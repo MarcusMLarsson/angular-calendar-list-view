@@ -25,9 +25,7 @@ export class StateService {
    * @param date The new selected date.
    */
   setDayPickerSelectedDate(date: Date): void {
-    if (this.dayPickerSelectedDate.value.getTime() !== date.getTime()) {
-      this.dayPickerSelectedDate.next(date);
-    }
+    this.dayPickerSelectedDate.next(date);
   }
 
   /**

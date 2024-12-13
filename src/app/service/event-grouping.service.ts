@@ -1,13 +1,12 @@
 import { Injectable } from '@angular/core';
 import { getISOWeek } from 'date-fns';
-import { DatePipe } from '@angular/common';
 import { ListView, CalendarEvent } from '../utils/utils';
 
 @Injectable({
   providedIn: 'root',
 })
 export class EventGroupingService {
-  constructor(private datePipe: DatePipe) {}
+  constructor() {}
 
   /**
    * Group events by date based on the current list view

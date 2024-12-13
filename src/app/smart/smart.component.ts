@@ -112,27 +112,39 @@ export class SmartComponent implements OnChanges, OnInit, AfterViewInit {
   }
 
   private initializeSubscriptions(): void {
-    // listens to when the user scrolls in the list
-    this.calendarListStateService.listViewScrolledDate$
-      .pipe(takeUntilDestroyed(this.destroyRef))
-      .subscribe((date: Date) => {
-        this.dayPickerSelectedDate = date;
-        this.updateDatePickerOnScrollOutOfRange();
-      });
+    // Create a flag to track recent day picker interaction
+    // Needed since both the scroll and the day picker update the selected date, which can cause conflicts
+    // If the day picker was recently used, the day picker selected date should take priority
+    let dayPickerPriority = false;
 
-    // listens to when the user selects a day in the day picker
     this.calendarListStateService.dayPickerSelectedDate$
       .pipe(takeUntilDestroyed(this.destroyRef))
       .subscribe((date: Date) => {
+        dayPickerPriority = true;
         this.dayPickerSelectedDate = date;
         this.groupedEventsByDate = this.eventGroupingService.groupEventsByDate(
           this.events,
           this.listView,
           this.viewDate
         );
-
         this.cdr.detectChanges();
         this.scrollToSelectedDate();
+
+        // Reset priority after a short delay
+        setTimeout(() => {
+          dayPickerPriority = false;
+        }, 500);
+      });
+
+    // Scroll stream
+    this.calendarListStateService.listViewScrolledDate$
+      .pipe(takeUntilDestroyed(this.destroyRef))
+      .subscribe((date: Date) => {
+        // Only update if day picker hasn't been recently used
+        if (!dayPickerPriority) {
+          this.dayPickerSelectedDate = date;
+          this.updateDatePickerOnScrollOutOfRange();
+        }
       });
   }
 
@@ -264,19 +276,43 @@ export class SmartComponent implements OnChanges, OnInit, AfterViewInit {
       'date-' + formattedSelectedDateLabel
     );
 
-    console.log(dateElement);
-
-    // Get reference to the scroll container
     const listViewContainer = document.querySelector('.scroll-container');
 
-    if (dateElement && listViewContainer) {
-      // Scroll the element into view with an offset (for the header)
-      // block: 'start' option ensures the element scrolls to the top of the container.
-      dateElement.scrollIntoView({
-        behavior: 'instant',
-        block: 'start',
-        inline: 'nearest',
-      });
+    console.log(dateElement);
+    console.log(listViewContainer);
+
+    if (!dateElement) {
+      console.log('fallback');
+
+      this.loadMoreEvents('previous');
+
+      this.cdr.detectChanges();
+
+      const dateElement = document.getElementById(
+        'date-' + formattedSelectedDateLabel
+      );
+
+      if (dateElement && listViewContainer) {
+        // Scroll the element into view with an offset (for the header)
+        // block: 'start' option ensures the element scrolls to the top of the container.
+        dateElement.scrollIntoView({
+          behavior: 'instant',
+          block: 'start',
+          inline: 'nearest',
+        });
+      }
+    } else {
+      // Get reference to the scroll container
+      const listViewContainer = document.querySelector('.scroll-container');
+
+      if (dateElement && listViewContainer) {
+        // Scroll the element into view with an offset (for the header)
+        // block: 'start' option ensures the element scrolls to the top of the container.
+        dateElement.scrollIntoView({
+          behavior: 'instant',
+          block: 'start',
+        });
+      }
     }
   }
 

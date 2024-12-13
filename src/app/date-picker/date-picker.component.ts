@@ -1,4 +1,10 @@
-import { Component, Input, Output, EventEmitter } from '@angular/core';
+import {
+  Component,
+  Input,
+  Output,
+  EventEmitter,
+  ChangeDetectorRef,
+} from '@angular/core';
 import { DatePipe } from '@angular/common';
 import { StateService } from '../service/state.service';
 
@@ -25,7 +31,8 @@ export class DatePickerComponent {
 
   constructor(
     public datePipe: DatePipe,
-    private calendarListStateService: StateService
+    private calendarListStateService: StateService,
+    private cdr: ChangeDetectorRef
   ) {}
 
   /*

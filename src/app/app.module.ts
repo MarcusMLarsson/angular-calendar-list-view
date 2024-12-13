@@ -12,6 +12,7 @@ import { WeekNumberPipe } from './pipes/week-number/week-number.pipe';
 import { MatIconModule } from '@angular/material/icon';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 import { ScrollingModule } from '@angular/cdk/scrolling';
+import { IsSameMonthPipe } from './pipes/is-same-month.pipe';
 
 @NgModule({
   declarations: [
@@ -21,6 +22,7 @@ import { ScrollingModule } from '@angular/cdk/scrolling';
     DatePickerComponent,
     IsSelectedDayPipe,
     WeekNumberPipe,
+    IsSameMonthPipe,
   ],
   imports: [
     BrowserModule,

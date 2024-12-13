@@ -58,7 +58,7 @@
         >
           <div
             [class.selected]="day.date | isSelectedDay : viewDate"
-            [class.other-month]="!isSameMonth(day.date)"
+            [class.other-month]="!(day.date | isSameMonth : viewDate)"
           >
             {{ day.dayNumber }}
           </div>

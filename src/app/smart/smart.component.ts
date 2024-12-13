@@ -63,6 +63,11 @@ export class SmartComponent implements OnChanges, OnInit, AfterViewInit {
 
   weekStartsOn: Day | undefined;
 
+  /*
+   * Used to prevent that the scrollToSelectedDate method triggers onScroll
+   */
+  private isProgrammaticScroll = false;
+
   private destroyRef = inject(DestroyRef);
 
   constructor(
@@ -232,6 +237,10 @@ export class SmartComponent implements OnChanges, OnInit, AfterViewInit {
       }
     }
 
+    if (this.isProgrammaticScroll) {
+      return;
+    }
+
     // Load more events when the user scrolls to the top or bottom of the list view
     if (scrollableContainer.scrollTop === 0) {
       // This is needed to maintain the scroll position when adding events to the top
@@ -258,6 +267,8 @@ export class SmartComponent implements OnChanges, OnInit, AfterViewInit {
    * Scrolls to the selected date in the calendar list view when a date is clicked in the day picker.
    */
   private scrollToSelectedDate(): void {
+    this.isProgrammaticScroll = true;
+
     // Format the selected date to match the date label in the list view
     // date format needs to match the date label in the list view
     const formattedSelectedDateLabel = this.datePipe.transform(
@@ -309,6 +320,11 @@ export class SmartComponent implements OnChanges, OnInit, AfterViewInit {
         });
       }
     }
+
+    // Reset programmatic scroll flag after a delay
+    setTimeout(() => {
+      this.isProgrammaticScroll = false;
+    }, 200);
   }
 
   /*

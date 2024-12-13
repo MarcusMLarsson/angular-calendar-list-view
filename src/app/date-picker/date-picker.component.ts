@@ -50,6 +50,13 @@ export class DatePickerComponent {
    * Sets the selected date to the clicked date *
    */
   onDateClick(date: Date): void {
+    if (!this.isSameMonth(date)) {
+      if (date.getDate() < 15) {
+        console.log('Hello');
+        this.goToNextStep(this.dayPickerViewMode);
+      } else this.goToPreviousStep(this.dayPickerViewMode);
+    }
+
     this.calendarListStateService.setDayPickerSelectedDate(date);
   }
 

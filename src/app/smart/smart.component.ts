@@ -33,11 +33,6 @@ export class SmartComponent implements OnChanges, OnInit, AfterViewInit {
   listView = ListView.Day;
 
   /**
-   * The selected date in the day picker
-   */
-  dayPickerSelectedDate!: Date;
-
-  /**
    * An array of events to display on view
    * The schema is available here: https://github.com/mattlewis92/calendar-utils/blob/c51689985f59a271940e30bc4e2c4e1fee3fcb5c/src/calendarUtils.ts#L49-L63
    */
@@ -121,7 +116,7 @@ export class SmartComponent implements OnChanges, OnInit, AfterViewInit {
       .pipe(takeUntilDestroyed(this.destroyRef))
       .subscribe((date: Date) => {
         dayPickerPriority = true;
-        this.dayPickerSelectedDate = date;
+        this.viewDate = date;
         this.groupedEventsByDate = this.eventGroupingService.groupEventsByDate(
           this.events,
           this.listView,
@@ -142,7 +137,7 @@ export class SmartComponent implements OnChanges, OnInit, AfterViewInit {
       .subscribe((date: Date) => {
         // Only update if day picker hasn't been recently used
         if (!dayPickerPriority) {
-          this.dayPickerSelectedDate = date;
+          this.viewDate = date;
           this.updateDatePickerOnScrollOutOfRange();
         }
       });
@@ -164,12 +159,11 @@ export class SmartComponent implements OnChanges, OnInit, AfterViewInit {
         ].date
       );
 
-      const selectedDate = new Date(this.dayPickerSelectedDate);
+      const selectedDate = new Date(this.viewDate);
 
       if (selectedDate < firstDay || selectedDate > lastDay) {
-        this.viewDate = this.dayPickerSelectedDate;
         this.currentMonthDays = this.datePickerService.generateMonth(
-          this.dayPickerSelectedDate,
+          this.viewDate,
           0
         );
       }
@@ -181,12 +175,12 @@ export class SmartComponent implements OnChanges, OnInit, AfterViewInit {
       const lastDay = new Date(
         this.currentWeekDays[this.currentWeekDays.length - 1].date
       );
-      const selectedDate = new Date(this.dayPickerSelectedDate);
+      const selectedDate = new Date(this.viewDate);
 
       if (selectedDate < firstDay || selectedDate > lastDay) {
-        this.viewDate = this.dayPickerSelectedDate;
+        this.viewDate = this.viewDate;
         this.currentWeekDays = this.datePickerService.getWeekDays(
-          this.dayPickerSelectedDate,
+          this.viewDate,
           0
         );
       }
@@ -195,7 +189,7 @@ export class SmartComponent implements OnChanges, OnInit, AfterViewInit {
 
   /*
    * This method is called when the user scrolls in the list view.
-   * Updates the dayPickerSelectedDate in the list view based on the scroll position.
+   * Updates the viewDate in the list view based on the scroll position.
    * Loads more events when the user scrolls to the top or bottom of the list view.
    */
   onScroll(): void {
@@ -267,7 +261,7 @@ export class SmartComponent implements OnChanges, OnInit, AfterViewInit {
     // Format the selected date to match the date label in the list view
     // date format needs to match the date label in the list view
     const formattedSelectedDateLabel = this.datePipe.transform(
-      this.dayPickerSelectedDate,
+      this.viewDate,
       'yyyy-MM-dd'
     );
 
@@ -281,7 +275,7 @@ export class SmartComponent implements OnChanges, OnInit, AfterViewInit {
     // fallback is needed when the dates in the datepicker are outside the current view
     if (!dateElement) {
       console.log('fallback');
-      if (this.dayPickerSelectedDate.getDate() > 15) {
+      if (this.viewDate.getDate() > 15) {
         this.loadMoreEvents('previous');
         this.cdr.detectChanges();
       } else {

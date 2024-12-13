@@ -1,5 +1,4 @@
 <div class="calendar-container">
-  {{ dayPickerSelectedDate }}
   <div class="calendar-header-container">
     <div class="stepper-container">
       <div class="material-icons" (click)="goToPreviousStep(dayPickerViewMode)">
@@ -35,7 +34,7 @@
           </div>
           <div
             class="day-of-the-week"
-            [class.selected]="day.date | isSelectedDay : dayPickerSelectedDate"
+            [class.selected]="day.date | isSelectedDay : viewDate"
             (click)="onDateClick(day.date)"
           >
             {{ day.dayNumber }}
@@ -58,7 +57,7 @@
           (click)="onDateClick(day.date)"
         >
           <div
-            [class.selected]="day.date | isSelectedDay : dayPickerSelectedDate"
+            [class.selected]="day.date | isSelectedDay : viewDate"
             [class.other-month]="!isSameMonth(day.date)"
           >
             {{ day.dayNumber }}

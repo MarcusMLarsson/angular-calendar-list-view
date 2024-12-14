@@ -40,7 +40,7 @@ export class SmartComponent implements OnChanges, OnInit, AfterViewInit {
   /**
    * Determines how events are grouped in the list view, either by day, week, or month.
    */
-  listView = ListView.Week;
+  listView = ListView.Day;
 
   /**
    * An array of events to display on view

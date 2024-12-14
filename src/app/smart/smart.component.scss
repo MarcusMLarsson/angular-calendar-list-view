@@ -1,8 +1,10 @@
+/* Base Layout (for mobile) */
 .calendar-container {
   display: flex;
   flex-direction: column;
   height: 100vh;
   overflow: hidden;
+  box-shadow: 0 6px 12px rgba(0, 0, 0, 0.3);
 }
 
 .scroll-container {
@@ -42,5 +44,40 @@ app-list {
   z-index: 20;
   cursor: pointer;
   transition: background-color 0.3s;
-  box-shadow: 0 6px 12px rgba(0, 0, 0, 0.3);
+}
+
+/* Desktop Layout */
+@media (min-width: 1024px) {
+  .calendar-container {
+    display: flex;
+    flex-direction: row; /* Switch to a horizontal layout */
+    height: auto;
+    overflow: initial;
+  }
+
+  app-date-picker {
+    width: 300px; /* Adjust the width of the date picker */
+    position: sticky; /* Makes the date picker stay at the top of the scrollable area */
+    top: 0; /* Sticks to the top of the screen/container */
+    background-color: white;
+    z-index: 10; /* Ensures it stays above other elements */
+  }
+
+  .scroll-container {
+    margin-left: 20px; /* Adds space between date picker and event list */
+    margin-top: 0; /* Removes the top margin */
+    flex-grow: 1;
+    overflow-y: auto; /* Enable vertical scrolling */
+    min-height: 0;
+    max-height: calc(
+      100vh - 60px
+    ); /* Makes the scroll area fill the available space below the sticky date picker */
+  }
+
+  .add-event-button {
+    position: fixed;
+    bottom: 20px;
+    right: 20px;
+    z-index: 20;
+  }
 }

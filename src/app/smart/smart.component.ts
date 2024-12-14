@@ -25,6 +25,7 @@ import {
 import { DatePipe } from '@angular/common';
 import { EventGroupingService } from '../service/event-grouping.service';
 import { DatePickerService } from '../service/date-picker.service';
+import { ScrollService } from '../service/scroll.service';
 
 @Component({
   selector: 'app-smart',
@@ -85,7 +86,8 @@ export class SmartComponent implements OnChanges, OnInit, AfterViewInit {
     private datePipe: DatePipe,
     private cdr: ChangeDetectorRef,
     private eventGroupingService: EventGroupingService,
-    private datePickerService: DatePickerService
+    private datePickerService: DatePickerService,
+    private scrollService: ScrollService
   ) {}
 
   ngOnInit() {
@@ -283,7 +285,13 @@ export class SmartComponent implements OnChanges, OnInit, AfterViewInit {
         scrollableContainer.scrollHeight - scrollableContainer.scrollTop;
 
       // Call the loadMoreEvents function
-      this.loadMoreEvents('previous');
+      this.groupedEventsByDate = this.eventGroupingService.loadMoreEvents(
+        this.events,
+        this.groupedEventsByDate,
+        this.listView,
+        this.viewDate,
+        'previous'
+      );
 
       this.cdr.detectChanges();
 
@@ -294,7 +302,13 @@ export class SmartComponent implements OnChanges, OnInit, AfterViewInit {
       scrollableContainer.clientHeight
     ) {
       // Scrolled to the bottom - Load next events
-      this.loadMoreEvents('next');
+      this.groupedEventsByDate = this.eventGroupingService.loadMoreEvents(
+        this.events,
+        this.groupedEventsByDate,
+        this.listView,
+        this.viewDate,
+        'next'
+      );
     }
   }
 
@@ -334,10 +348,22 @@ export class SmartComponent implements OnChanges, OnInit, AfterViewInit {
     if (!dateElement) {
       console.log('fallback');
       if (this.viewDate.getDate() > 15) {
-        this.loadMoreEvents('previous');
+        this.groupedEventsByDate = this.eventGroupingService.loadMoreEvents(
+          this.events,
+          this.groupedEventsByDate,
+          this.listView,
+          this.viewDate,
+          'previous'
+        );
         this.cdr.detectChanges();
       } else {
-        this.loadMoreEvents('next');
+        this.groupedEventsByDate = this.eventGroupingService.loadMoreEvents(
+          this.events,
+          this.groupedEventsByDate,
+          this.listView,
+          this.viewDate,
+          'next'
+        );
         this.cdr.detectChanges();
       }
 
@@ -372,45 +398,6 @@ export class SmartComponent implements OnChanges, OnInit, AfterViewInit {
     setTimeout(() => {
       this.isProgrammaticScroll = false;
     }, 200);
-  }
-
-  /*
-   * Load more events when the user scrolls to the top or bottom of the list view
-   * @param append - Determines whether to load more events to the previous or next period
-   *
-   */
-  loadMoreEvents(append: 'previous' | 'next'): void {
-    // Limit the number of items in the list view
-    const maxItems = 200;
-
-    const newGroupedEvents = this.eventGroupingService.groupEventsByDate(
-      this.events,
-      this.listView,
-      this.viewDate,
-      append
-    );
-
-    if (append === 'previous') {
-      this.viewDate = subMonths(this.viewDate, 1);
-      this.groupedEventsByDate = [
-        ...newGroupedEvents,
-        ...this.groupedEventsByDate,
-      ];
-
-      if (this.groupedEventsByDate.length > maxItems) {
-        this.groupedEventsByDate = this.groupedEventsByDate.slice(0, maxItems);
-      }
-    } else if (append === 'next') {
-      this.viewDate = addMonths(this.viewDate, 1);
-      this.groupedEventsByDate = [
-        ...this.groupedEventsByDate,
-        ...newGroupedEvents,
-      ];
-
-      if (this.groupedEventsByDate.length > maxItems) {
-        this.groupedEventsByDate = this.groupedEventsByDate.slice(-maxItems);
-      }
-    }
   }
 
   /*

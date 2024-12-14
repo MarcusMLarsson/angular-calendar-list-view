@@ -1,5 +1,5 @@
 import { Injectable } from '@angular/core';
-import { getISOWeek } from 'date-fns';
+import { addMonths, getISOWeek, subMonths } from 'date-fns';
 import { ListView, CalendarEvent } from '../utils/utils';
 
 @Injectable({
@@ -259,5 +259,53 @@ export class EventGroupingService {
       default:
         return currentDate.getFullYear();
     }
+  }
+
+  /**
+   * Load more events to the grouped events based on the current view
+   * @param events Array of calendar events
+   * @param listView Current list view mode (Day/Week/Month)
+   * @param viewDate Current view date
+   * @param append Determines whether to load more events to the previous or next period
+   * @param groupedEvents Current grouped events by date
+   * @returns Updated grouped events with new events added
+   */
+  loadMoreEvents(
+    events: CalendarEvent[],
+    groupedEvents: { dateLabel: Date; events: CalendarEvent[] }[],
+    listView: ListView,
+    viewDate: Date,
+    append: 'previous' | 'next'
+  ): { dateLabel: Date; events: CalendarEvent[] }[] {
+    const newGroupedEvents = this.groupEventsByDate(
+      events,
+      listView,
+      viewDate,
+      append
+    );
+
+    // Maximum number of items in the list
+    const maxItems = 200;
+
+    if (append === 'previous') {
+      // Adjust the viewDate to the previous period (e.g., previous month)
+      viewDate = subMonths(viewDate, 1);
+      groupedEvents = [...newGroupedEvents, ...groupedEvents];
+    } else if (append === 'next') {
+      // Adjust the viewDate to the next period (e.g., next month)
+      viewDate = addMonths(viewDate, 1);
+      groupedEvents = [...groupedEvents, ...newGroupedEvents];
+    }
+
+    // Ensure that the number of events does not exceed maxItems
+    if (groupedEvents.length > maxItems) {
+      if (append === 'previous') {
+        groupedEvents = groupedEvents.slice(0, maxItems);
+      } else {
+        groupedEvents = groupedEvents.slice(-maxItems);
+      }
+    }
+
+    return groupedEvents;
   }
 }

@@ -153,7 +153,7 @@ export class EventGroupingService {
   }
 
   /**
-   * Generate week labels
+   * Generate week labels with correct ISO week numbering
    * @param viewDate Current view date
    * @param append Append option
    * @returns Array of week labels
@@ -165,22 +165,35 @@ export class EventGroupingService {
     const targetYear = this.getTargetYear(viewDate, append);
     const labels: Date[] = [];
 
-    let currentDate = new Date(viewDate);
+    // Determine the number of weeks to generate
+    const weeksToGenerate = 52; // Typical number of weeks in a year
 
-    // Adjust to the start of the week (Monday)
-    while (currentDate.getDay() !== 1) {
-      currentDate.setDate(currentDate.getDate() - 1);
+    // Calculate the starting week based on the view date
+    const startWeek = getISOWeek(viewDate);
+    const startDate = new Date(viewDate);
+
+    // Adjust to the first day (Monday) of the current week
+    while (startDate.getDay() !== 1) {
+      startDate.setDate(startDate.getDate() - 1);
     }
 
-    // Reset to the first day of the week for the target year
-    currentDate.setFullYear(targetYear);
+    // Generate week labels
+    for (let i = 0; i < weeksToGenerate; i++) {
+      const weekDate = new Date(startDate);
+      weekDate.setDate(startDate.getDate() + i * 7);
 
-    // Generate week labels for the entire year
-    const endOfYear = new Date(targetYear, 11, 31);
+      // Ensure we're still in the target year
+      if (weekDate.getFullYear() !== targetYear) break;
 
-    while (currentDate <= endOfYear) {
-      labels.push(new Date(currentDate));
-      currentDate.setDate(currentDate.getDate() + 7);
+      const currentWeek = getISOWeek(weekDate);
+
+      // Only add unique weeks
+      if (
+        labels.length === 0 ||
+        currentWeek !== getISOWeek(labels[labels.length - 1])
+      ) {
+        labels.push(weekDate);
+      }
     }
 
     return labels;

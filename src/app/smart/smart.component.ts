@@ -11,7 +11,17 @@ import {
 import { StateService } from '../service/state.service';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { events, ListView, CalendarEvent } from '../utils/utils';
-import { Day, subMonths, addMonths, parse } from 'date-fns';
+import {
+  Day,
+  subMonths,
+  addMonths,
+  parse,
+  setYear,
+  setWeek,
+  startOfWeek,
+  format,
+  startOfMonth,
+} from 'date-fns';
 import { DatePipe } from '@angular/common';
 import { EventGroupingService } from '../service/event-grouping.service';
 import { DatePickerService } from '../service/date-picker.service';
@@ -30,7 +40,7 @@ export class SmartComponent implements OnChanges, OnInit, AfterViewInit {
   /**
    * Determines how events are grouped in the list view, either by day, week, or month.
    */
-  listView = ListView.Day;
+  listView = ListView.Week;
 
   /**
    * An array of events to display on view
@@ -117,6 +127,8 @@ export class SmartComponent implements OnChanges, OnInit, AfterViewInit {
     // If the day picker was recently used, the day picker selected date should take priority
     let dayPickerPriority = false;
 
+    let firstRun = true;
+
     this.calendarListStateService.dayPickerSelectedDate$
       .pipe(takeUntilDestroyed(this.destroyRef))
       .subscribe((date: Date) => {
@@ -127,9 +139,14 @@ export class SmartComponent implements OnChanges, OnInit, AfterViewInit {
           this.listView,
           this.viewDate
         );
-        this.cdr.detectChanges();
-        this.scrollToSelectedDate();
 
+        this.cdr.detectChanges();
+
+        if (!firstRun) {
+          this.scrollToSelectedDate();
+        }
+
+        firstRun = false;
         // Reset priority after a short delay
         setTimeout(() => {
           dayPickerPriority = false;
@@ -183,7 +200,6 @@ export class SmartComponent implements OnChanges, OnInit, AfterViewInit {
       const selectedDate = new Date(this.viewDate);
 
       if (selectedDate < firstDay || selectedDate > lastDay) {
-        this.viewDate = this.viewDate;
         this.currentWeekDays = this.datePickerService.getWeekDays(
           this.viewDate,
           0
@@ -224,8 +240,27 @@ export class SmartComponent implements OnChanges, OnInit, AfterViewInit {
           ?.textContent?.trim();
 
         if (weekdayHeader && monthYearHeader) {
-          // Combine the weekday and month-year parts into a full date string
-          const fullDateString = `${weekdayHeader} ${monthYearHeader}`;
+          let fullDateString = '';
+          // Combine the weekday and month-year label parts into a full date.
+
+          // Week view
+          if (this.listView === ListView.Week) {
+            fullDateString = `${weekdayHeader} ${monthYearHeader}`;
+            const week = Number(weekdayHeader.split('W')[1]);
+            const year = Number(monthYearHeader.split(' ')[1]); // Parse year as a number
+
+            let date = setYear(new Date(), year); // Sets the year to 2024
+
+            // Step 2: Set the week number
+            date = setWeek(date, week); // Sets the ISO week to 50
+
+            // Step 3: Get the first day of the week (e.g., Monday as the start of the week)
+            fullDateString = `${startOfWeek(date, { weekStartsOn: 1 })}`;
+          }
+          // Day and month view
+          else {
+            fullDateString = `${weekdayHeader} ${monthYearHeader}`;
+          }
 
           const parsedDate = new Date(fullDateString);
 
@@ -271,10 +306,22 @@ export class SmartComponent implements OnChanges, OnInit, AfterViewInit {
 
     // Format the selected date to match the date label in the list view
     // date format needs to match the date label in the list view
-    const formattedSelectedDateLabel = this.datePipe.transform(
+    // Date format needs to match the date label in the list view
+    let formattedSelectedDateLabel = this.datePipe.transform(
       this.viewDate,
       'yyyy-MM-dd'
     );
+
+    if (this.listView === ListView.Week) {
+      const startOfWeekDate = startOfWeek(this.viewDate, { weekStartsOn: 1 });
+
+      // Reformat the start of the week date to match the date label format
+      formattedSelectedDateLabel = format(startOfWeekDate, 'yyyy-MM-dd');
+    } else if (this.listView === ListView.Month) {
+      const startOfMonthDate = startOfMonth(this.viewDate);
+
+      formattedSelectedDateLabel = format(startOfMonthDate, 'yyyy-MM-dd');
+    }
 
     // Find the DOM element that matches the selected date label
     const dateElement = document.getElementById(

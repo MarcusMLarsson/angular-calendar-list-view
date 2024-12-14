@@ -50,9 +50,9 @@ export class DatePickerComponent {
    * Sets the selected date to the clicked date *
    */
   onDateClick(date: Date): void {
+    // If the users presses a date in the datepicker month view that are outside of the current month, the view should change to that month
     if (!this.isSameMonth(date)) {
       if (date.getDate() < 15) {
-        console.log('Hello');
         this.goToNextStep(this.dayPickerViewMode);
       } else this.goToPreviousStep(this.dayPickerViewMode);
     }

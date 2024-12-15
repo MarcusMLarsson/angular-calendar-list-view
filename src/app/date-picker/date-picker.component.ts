@@ -1,4 +1,11 @@
-import { Component, Input, Output, EventEmitter } from '@angular/core';
+import {
+  Component,
+  Input,
+  Output,
+  EventEmitter,
+  SimpleChanges,
+  OnChanges,
+} from '@angular/core';
 import { DatePipe } from '@angular/common';
 import { StateService } from '../service/state.service';
 
@@ -7,10 +14,11 @@ import { StateService } from '../service/state.service';
   templateUrl: './date-picker.component.html',
   styleUrls: ['./date-picker.component.scss'],
 })
-export class DatePickerComponent {
+export class DatePickerComponent implements OnChanges {
   @Input() dayOfWeekAbbreviations!: string[];
   @Input() currentMonthDays!: Array<Array<{ date: Date; dayNumber: number }>>;
   @Input() viewDate: Date = new Date();
+  @Input() isMobileView!: boolean;
 
   @Input() currentWeekDays!: Array<{ date: Date; dayNumber: number }>;
   @Output() changeStep = new EventEmitter<{
@@ -26,6 +34,19 @@ export class DatePickerComponent {
     public datePipe: DatePipe,
     private calendarListStateService: StateService
   ) {}
+
+  ngOnChanges(changes: SimpleChanges): void {
+    if (changes['isMobileView']) {
+      if (changes['isMobileView'].currentValue) {
+        // If it's mobile view, start at 'week'
+        this.dayPickerViewMode = 'week';
+      } else {
+        // If it's not mobile view, start at 'month'
+        this.dayPickerViewMode = 'month';
+      }
+      this.viewModeChange.emit(this.dayPickerViewMode);
+    }
+  }
 
   /*
    * Expands or contract the day picker  *

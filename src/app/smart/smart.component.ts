@@ -7,15 +7,13 @@ import {
   OnChanges,
   OnInit,
   AfterViewInit,
+  HostListener,
 } from '@angular/core';
 import { StateService } from '../service/state.service';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { events, ListView, CalendarEvent } from '../utils/utils';
 import {
   Day,
-  subMonths,
-  addMonths,
-  parse,
   setYear,
   setWeek,
   startOfWeek,
@@ -25,8 +23,6 @@ import {
 import { DatePipe } from '@angular/common';
 import { EventGroupingService } from '../service/event-grouping.service';
 import { DatePickerService } from '../service/date-picker.service';
-import { ScrollService } from '../service/scroll.service';
-
 @Component({
   selector: 'app-smart',
   templateUrl: './smart.component.html',
@@ -81,13 +77,14 @@ export class SmartComponent implements OnChanges, OnInit, AfterViewInit {
 
   private destroyRef = inject(DestroyRef);
 
+  isMobileView = false;
+
   constructor(
     private calendarListStateService: StateService,
     private datePipe: DatePipe,
     private cdr: ChangeDetectorRef,
     private eventGroupingService: EventGroupingService,
-    private datePickerService: DatePickerService,
-    private scrollService: ScrollService
+    private datePickerService: DatePickerService
   ) {}
 
   ngOnInit() {
@@ -121,6 +118,15 @@ export class SmartComponent implements OnChanges, OnInit, AfterViewInit {
     if (scrollableContainer) {
       scrollableContainer.scrollTop = 5;
     }
+  }
+
+  @HostListener('window:resize', [])
+  onResize(): void {
+    this.checkViewportSize();
+  }
+
+  private checkViewportSize(): void {
+    this.isMobileView = window.innerWidth <= 1023;
   }
 
   private initializeSubscriptions(): void {

@@ -1,13 +1,18 @@
 <div class="calendar-container">
-  <app-date-picker
-    [viewDate]="viewDate"
-    [dayOfWeekAbbreviations]="dayOfWeekAbbreviations"
-    [currentWeekDays]="currentWeekDays"
-    [currentMonthDays]="currentMonthDays"
-    (changeStep)="onChangeStep($event)"
-    (viewModeChange)="onViewModeChange($event)"
-  ></app-date-picker>
-
+  <div class="desktop-container">
+    <button class="add-event-button" (click)="openAddEventDialog()">
+      <mat-icon>add</mat-icon>
+    </button>
+    <app-date-picker
+      [viewDate]="viewDate"
+      [dayOfWeekAbbreviations]="dayOfWeekAbbreviations"
+      [currentWeekDays]="currentWeekDays"
+      [currentMonthDays]="currentMonthDays"
+      [isMobileView]="isMobileView"
+      (changeStep)="onChangeStep($event)"
+      (viewModeChange)="onViewModeChange($event)"
+    ></app-date-picker>
+  </div>
   <app-list
     class="scroll-container"
     (scroll)="onScroll()"
@@ -16,8 +21,4 @@
     [listView]="listView"
     [groupedEventsByDate]="groupedEventsByDate"
   ></app-list>
-
-  <button class="add-event-button" (click)="openAddEventDialog()">
-    <mat-icon>add</mat-icon>
-  </button>
 </div>

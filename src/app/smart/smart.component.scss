@@ -1,10 +1,9 @@
-/* Base Layout (for mobile) */
+/* BASE LAYOUT */
 .calendar-container {
   display: flex;
   flex-direction: column;
   height: 100vh;
   overflow: hidden;
-  box-shadow: 0 6px 12px rgba(0, 0, 0, 0.3);
 }
 
 .scroll-container {
@@ -27,32 +26,46 @@ app-list {
 }
 
 .add-event-button {
-  position: absolute;
-  bottom: 20px;
-  right: 20px;
   width: 56px;
-  height: 56px;
-  border-radius: 50%;
-  background-color: #2778d5; /* Your chosen blue color */
+  height: 56px; /* Your chosen blue color */
   color: white;
   font-size: 36px; /* Icon size adjustment */
   border: none;
-  display: flex;
-  justify-content: center;
-  align-items: center;
   box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
   z-index: 20;
   cursor: pointer;
   transition: background-color 0.3s;
 }
 
-/* Desktop Layout */
+/* MOBILE LAYOUT */
+@media (max-width: 1023px) {
+  .calendar-container {
+    box-shadow: 0 6px 12px rgba(0, 0, 0, 0.3);
+  }
+
+  .add-event-button {
+    background-color: #2778d5;
+    position: absolute;
+    border-radius: 50%;
+    bottom: 20px;
+    right: 20px;
+  }
+}
+
+/* DESKTOP LAYOUT */
 @media (min-width: 1024px) {
   .calendar-container {
     display: flex;
-    flex-direction: row; /* Switch to a horizontal layout */
+    flex-direction: row;
     height: auto;
     overflow: initial;
+  }
+
+  .desktop-container {
+    display: flex;
+    flex-direction: column;
+    background: pink;
+    align-items: center;
   }
 
   app-date-picker {
@@ -64,7 +77,6 @@ app-list {
   }
 
   .scroll-container {
-    margin-left: 20px; /* Adds space between date picker and event list */
     margin-top: 0; /* Removes the top margin */
     flex-grow: 1;
     overflow-y: auto; /* Enable vertical scrolling */
@@ -75,9 +87,10 @@ app-list {
   }
 
   .add-event-button {
-    position: fixed;
-    bottom: 20px;
-    right: 20px;
-    z-index: 20;
+    position: relative;
+    margin: 20px 0;
+    display: flex;
+    justify-content: center;
+    align-items: center;
   }
 }

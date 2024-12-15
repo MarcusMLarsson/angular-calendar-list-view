@@ -15,7 +15,7 @@
         chevron_right
       </div>
     </div>
-    <span class="toggle-icon" (click)="toggleView()">
+    <span class="toggle-icon" (click)="toggleView()" *ngIf="isMobileView">
       <mat-icon>{{
         dayPickerViewMode === "month"
           ? "keyboard_arrow_down"

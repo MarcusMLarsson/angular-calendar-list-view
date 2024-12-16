@@ -7,7 +7,6 @@ import {
   OnChanges,
   OnInit,
   AfterViewInit,
-  HostListener,
 } from '@angular/core';
 import { StateService } from '../service/state.service';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
@@ -77,8 +76,6 @@ export class SmartComponent implements OnChanges, OnInit, AfterViewInit {
 
   private destroyRef = inject(DestroyRef);
 
-  isMobileView = false;
-
   constructor(
     private calendarListStateService: StateService,
     private datePipe: DatePipe,
@@ -118,15 +115,6 @@ export class SmartComponent implements OnChanges, OnInit, AfterViewInit {
     if (scrollableContainer) {
       scrollableContainer.scrollTop = 5;
     }
-  }
-
-  @HostListener('window:resize', [])
-  onResize(): void {
-    this.checkViewportSize();
-  }
-
-  private checkViewportSize(): void {
-    this.isMobileView = window.innerWidth <= 1023;
   }
 
   private initializeSubscriptions(): void {

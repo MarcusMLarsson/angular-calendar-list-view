@@ -122,7 +122,6 @@ export class SmartComponent implements OnChanges, OnInit, AfterViewInit {
     // Needed since both the scroll and the day picker update the selected date, which can cause conflicts
     // If the day picker was recently used, the day picker selected date should take priority
     let dayPickerPriority = false;
-
     let firstRun = true;
 
     this.calendarListStateService.dayPickerSelectedDate$

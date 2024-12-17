@@ -109,11 +109,40 @@ export class SmartComponent implements OnChanges, OnInit, AfterViewInit {
   }
 
   ngAfterViewInit(): void {
-    // Leave a small gap at the top of the list view to allow for scrolling and trigger new events on scroll
-    const scrollableContainer = document.querySelector('.scroll-container');
+    // Scrolls to today's date when the component is initialized
+    let formattedSelectedDateLabel = this.datePipe.transform(
+      this.viewDate,
+      'yyyy-MM-dd'
+    );
 
-    if (scrollableContainer) {
-      scrollableContainer.scrollTop = 5;
+    if (this.listView === ListView.Week) {
+      const startOfWeekDate = startOfWeek(this.viewDate, { weekStartsOn: 1 });
+
+      formattedSelectedDateLabel = format(startOfWeekDate, 'yyyy-MM-dd');
+    } else if (this.listView === ListView.Month) {
+      const startOfMonthDate = startOfMonth(this.viewDate);
+
+      formattedSelectedDateLabel = format(startOfMonthDate, 'yyyy-MM-dd');
+    }
+
+    const dateElement = document.getElementById(
+      'date-' + formattedSelectedDateLabel
+    );
+
+    const listViewContainer = document.querySelector('.scroll-container');
+
+    if (dateElement && listViewContainer) {
+      // Scroll the selected date into view
+      dateElement.scrollIntoView({
+        behavior: 'auto',
+        block: 'start',
+      });
+
+      setTimeout(() => {
+        if (listViewContainer instanceof HTMLElement) {
+          listViewContainer.scrollTop += 5; // Subtract 5 pixels from the scrollTop value
+        }
+      }, 0);
     }
   }
 

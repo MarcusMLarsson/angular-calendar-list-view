@@ -285,7 +285,7 @@ export class EventGroupingService {
     );
 
     // Maximum number of items in the list
-    const maxItems = 200;
+    const maxItems = 100;
 
     if (append === 'previous') {
       // Adjust the viewDate to the previous period (e.g., previous month)

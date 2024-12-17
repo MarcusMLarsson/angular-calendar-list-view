@@ -299,9 +299,9 @@ export class SmartComponent implements OnChanges, OnInit, AfterViewInit {
     if (this.isProgrammaticScroll) {
       return;
     }
-
     // Load more events when the user scrolls to the top or bottom of the list view
     if (scrollableContainer.scrollTop === 0) {
+      console.log('NOW IM HERE');
       // This is needed to maintain the scroll position when adding events to the top
       const currentOffset =
         scrollableContainer.scrollHeight - scrollableContainer.scrollTop;
@@ -317,8 +317,10 @@ export class SmartComponent implements OnChanges, OnInit, AfterViewInit {
 
       this.cdr.detectChanges();
 
-      scrollableContainer.scrollTop =
-        scrollableContainer.scrollHeight - currentOffset;
+      requestAnimationFrame(() => {
+        scrollableContainer.scrollTop =
+          scrollableContainer.scrollHeight - currentOffset;
+      });
     } else if (
       scrollableContainer.scrollHeight - scrollableContainer.scrollTop ===
       scrollableContainer.clientHeight

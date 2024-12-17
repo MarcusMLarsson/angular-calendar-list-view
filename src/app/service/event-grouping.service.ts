@@ -1,5 +1,12 @@
 import { Injectable } from '@angular/core';
-import { addMonths, getISOWeek, subMonths } from 'date-fns';
+import {
+  addMonths,
+  addWeeks,
+  getISOWeek,
+  getWeek,
+  startOfYear,
+  subMonths,
+} from 'date-fns';
 import { ListView, CalendarEvent } from '../utils/utils';
 
 @Injectable({
@@ -137,16 +144,16 @@ export class EventGroupingService {
     const targetStartDate = this.getTargetDate(viewDate, append);
     const labels: Date[] = [];
 
-    let currentDate = new Date(targetStartDate);
-    const lastDay = new Date(
-      currentDate.getFullYear(),
-      currentDate.getMonth() + 1,
+    let startDate = new Date(targetStartDate);
+    const endDate = new Date(
+      startDate.getFullYear(),
+      startDate.getMonth() + 1,
       0
     );
 
-    while (currentDate <= lastDay) {
-      labels.push(new Date(currentDate));
-      currentDate.setDate(currentDate.getDate() + 1);
+    while (startDate <= endDate) {
+      labels.push(new Date(startDate));
+      startDate.setDate(startDate.getDate() + 1);
     }
 
     return labels;
@@ -158,6 +165,8 @@ export class EventGroupingService {
    * @param append Append option
    * @returns Array of week labels
    */
+
+  //TODO, week calculating is wrong sometimes
   private generateWeekLabels(
     viewDate: Date,
     append: 'previous' | 'next' | 'none' = 'none'
@@ -165,29 +174,25 @@ export class EventGroupingService {
     const targetYear = this.getTargetYear(viewDate, append);
     const labels: Date[] = [];
 
-    // Determine the number of weeks to generate
-    const weeksToGenerate = 52; // Typical number of weeks in a year
+    const firstDayOfYear = startOfYear(new Date(targetYear, 0, 1));
 
-    // Calculate the starting week based on the view date
-    const startWeek = getISOWeek(viewDate);
-    const startDate = new Date(viewDate);
+    let startDate = firstDayOfYear;
 
-    // Adjust to the first day (Monday) of the current week
-    while (startDate.getDay() !== 1) {
-      startDate.setDate(startDate.getDate() - 1);
+    if (startDate.getDay() !== 1) {
+      startDate = addWeeks(startDate, 1);
+      startDate.setDate(startDate.getDate() - startDate.getDay() + 1);
     }
 
-    // Generate week labels
+    const weeksToGenerate = 52;
+
     for (let i = 0; i < weeksToGenerate; i++) {
       const weekDate = new Date(startDate);
       weekDate.setDate(startDate.getDate() + i * 7);
 
-      // Ensure we're still in the target year
       if (weekDate.getFullYear() !== targetYear) break;
 
       const currentWeek = getISOWeek(weekDate);
 
-      // Only add unique weeks
       if (
         labels.length === 0 ||
         currentWeek !== getISOWeek(labels[labels.length - 1])
@@ -220,24 +225,16 @@ export class EventGroupingService {
    * @returns Adjusted target date
    */
   private getTargetDate(
-    currentDate: Date,
+    viewDate: Date,
     append: 'previous' | 'next' | 'none' = 'none'
   ): Date {
     switch (append) {
       case 'previous':
-        return new Date(
-          currentDate.getFullYear(),
-          currentDate.getMonth() - 1,
-          1
-        );
+        return new Date(viewDate.getFullYear(), viewDate.getMonth() - 1, 1);
       case 'next':
-        return new Date(
-          currentDate.getFullYear(),
-          currentDate.getMonth() + 1,
-          1
-        );
+        return new Date(viewDate.getFullYear(), viewDate.getMonth() + 1, 1);
       default:
-        return new Date(currentDate.getFullYear(), currentDate.getMonth(), 1);
+        return new Date(viewDate.getFullYear(), viewDate.getMonth(), 1);
     }
   }
 
@@ -299,6 +296,7 @@ export class EventGroupingService {
 
     // Ensure that the number of events does not exceed maxItems
     if (groupedEvents.length > maxItems) {
+      console.log('HELLO');
       if (append === 'previous') {
         groupedEvents = groupedEvents.slice(0, maxItems);
       } else {

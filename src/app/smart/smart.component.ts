@@ -7,6 +7,8 @@ import {
   OnChanges,
   OnInit,
   AfterViewInit,
+  ViewChild,
+  ElementRef,
 } from '@angular/core';
 import { StateService } from '../service/state.service';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
@@ -76,6 +78,9 @@ export class SmartComponent implements OnChanges, OnInit, AfterViewInit {
 
   private destroyRef = inject(DestroyRef);
 
+  @ViewChild('scrollableContainer') scrollableContainer!: ElementRef;
+  @ViewChild('referenceElement') referenceElement!: ElementRef;
+
   constructor(
     private calendarListStateService: StateService,
     private datePipe: DatePipe,
@@ -110,40 +115,7 @@ export class SmartComponent implements OnChanges, OnInit, AfterViewInit {
 
   ngAfterViewInit(): void {
     // Scrolls to today's date when the component is initialized
-    let formattedSelectedDateLabel = this.datePipe.transform(
-      this.viewDate,
-      'yyyy-MM-dd'
-    );
-
-    if (this.listView === ListView.Week) {
-      const startOfWeekDate = startOfWeek(this.viewDate, { weekStartsOn: 1 });
-
-      formattedSelectedDateLabel = format(startOfWeekDate, 'yyyy-MM-dd');
-    } else if (this.listView === ListView.Month) {
-      const startOfMonthDate = startOfMonth(this.viewDate);
-
-      formattedSelectedDateLabel = format(startOfMonthDate, 'yyyy-MM-dd');
-    }
-
-    const dateElement = document.getElementById(
-      'date-' + formattedSelectedDateLabel
-    );
-
-    const listViewContainer = document.querySelector('.scroll-container');
-
-    if (dateElement && listViewContainer) {
-      // Scroll the selected date into view
-      dateElement.scrollIntoView({
-        behavior: 'auto',
-        block: 'start',
-      });
-
-      setTimeout(() => {
-        if (listViewContainer instanceof HTMLElement) {
-          listViewContainer.scrollTop += 5; // Subtract 5 pixels from the scrollTop value
-        }
-      }, 0);
-    }
+    this.scrollToDate(this.viewDate, 5);
   }
 
   private initializeSubscriptions(): void {
@@ -186,6 +158,12 @@ export class SmartComponent implements OnChanges, OnInit, AfterViewInit {
           this.viewDate = date;
           this.updateDatePickerOnScrollOutOfRange();
         }
+      });
+
+    this.calendarListStateService.lastScrolledDate$
+      .pipe(takeUntilDestroyed(this.destroyRef))
+      .subscribe((lastScrolledDate) => {
+        this.scrollToDate(lastScrolledDate);
       });
   }
 
@@ -301,12 +279,7 @@ export class SmartComponent implements OnChanges, OnInit, AfterViewInit {
     }
     // Load more events when the user scrolls to the top or bottom of the list view
     if (scrollableContainer.scrollTop === 0) {
-      console.log('NOW IM HERE');
-      // This is needed to maintain the scroll position when adding events to the top
-      const currentOffset =
-        scrollableContainer.scrollHeight - scrollableContainer.scrollTop;
-
-      // Call the loadMoreEvents function
+      // Call the loadMoreEvents function (this could add or remove items)
       this.groupedEventsByDate = this.eventGroupingService.loadMoreEvents(
         this.events,
         this.groupedEventsByDate,
@@ -314,13 +287,6 @@ export class SmartComponent implements OnChanges, OnInit, AfterViewInit {
         this.viewDate,
         'previous'
       );
-
-      this.cdr.detectChanges();
-
-      requestAnimationFrame(() => {
-        scrollableContainer.scrollTop =
-          scrollableContainer.scrollHeight - currentOffset;
-      });
     } else if (
       scrollableContainer.scrollHeight - scrollableContainer.scrollTop ===
       scrollableContainer.clientHeight
@@ -370,7 +336,6 @@ export class SmartComponent implements OnChanges, OnInit, AfterViewInit {
 
     // fallback is needed when the dates in the datepicker are outside the current view
     if (!dateElement) {
-      console.log('fallback');
       if (this.viewDate.getDate() > 15) {
         this.groupedEventsByDate = this.eventGroupingService.loadMoreEvents(
           this.events,
@@ -452,6 +417,45 @@ export class SmartComponent implements OnChanges, OnInit, AfterViewInit {
         this.viewDate,
         0
       );
+    }
+  }
+
+  private scrollToDate(viewDate: Date, offset: number = 0): void {
+    // Format the selected date to match the date label in the list view
+    let formattedSelectedDateLabel = this.datePipe.transform(
+      viewDate,
+      'yyyy-MM-dd'
+    );
+
+    if (this.listView === ListView.Week) {
+      const startOfWeekDate = startOfWeek(viewDate, { weekStartsOn: 1 });
+      formattedSelectedDateLabel = format(startOfWeekDate, 'yyyy-MM-dd');
+    } else if (this.listView === ListView.Month) {
+      const startOfMonthDate = startOfMonth(viewDate);
+      formattedSelectedDateLabel = format(startOfMonthDate, 'yyyy-MM-dd');
+    }
+
+    // Find the DOM element that matches the selected date label
+    const dateElement = document.getElementById(
+      'date-' + formattedSelectedDateLabel
+    );
+
+    const listViewContainer = document.querySelector('.scroll-container');
+
+    if (dateElement && listViewContainer) {
+      // Scroll the element into view with an offset (for the header)
+      requestAnimationFrame(() => {
+        dateElement.scrollIntoView({
+          behavior: 'instant',
+          block: 'start',
+        });
+        // Add a small delay to account for the scroll, then apply the offset
+        setTimeout(() => {
+          if (listViewContainer instanceof HTMLElement) {
+            listViewContainer.scrollTop += offset; // Subtract 5 pixels from the scrollTop value
+          }
+        }, 0);
+      });
     }
   }
 

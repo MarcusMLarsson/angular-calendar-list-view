@@ -37,4 +37,20 @@ export class StateService {
       this.listViewScrolledDate.next(date);
     }
   }
+
+  /**
+   * Represents the last date that was scrolled to in the list view.
+   */
+  private lastScrolledDate = new BehaviorSubject<Date>(new Date());
+  lastScrolledDate$ = this.lastScrolledDate.asObservable();
+
+  /**
+   * Updates the last scrolled date (used for maintaining scroll position).
+   * @param date The last scrolled date in the list view.
+   */
+  setLastScrolledDate(date: Date): void {
+    if (this.lastScrolledDate.value.getTime() !== date.getTime()) {
+      this.lastScrolledDate.next(date);
+    }
+  }
 }

@@ -6,14 +6,16 @@ import {
   getWeek,
   startOfYear,
   subMonths,
+  startOfMonth,
 } from 'date-fns';
 import { ListView, CalendarEvent } from '../utils/utils';
+import { StateService } from './state.service';
 
 @Injectable({
   providedIn: 'root',
 })
 export class EventGroupingService {
-  constructor() {}
+  constructor(private stateService: StateService) {}
 
   /**
    * Group events by date based on the current list view
@@ -282,10 +284,13 @@ export class EventGroupingService {
     );
 
     // Maximum number of items in the list
-    const maxItems = 100;
+    const maxItems = 500;
+
+    // Update the last scrolled date in the StateService
 
     if (append === 'previous') {
       // Adjust the viewDate to the previous period (e.g., previous month)
+      this.stateService.setLastScrolledDate(startOfMonth(viewDate));
       viewDate = subMonths(viewDate, 1);
       groupedEvents = [...newGroupedEvents, ...groupedEvents];
     } else if (append === 'next') {

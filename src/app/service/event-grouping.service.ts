@@ -3,19 +3,28 @@ import {
   addMonths,
   addWeeks,
   getISOWeek,
-  getWeek,
   startOfYear,
   subMonths,
   startOfMonth,
+  startOfWeek,
+  getISOWeekYear,
+  getYear,
+  getISOWeeksInYear,
 } from 'date-fns';
-import { ListView, CalendarEvent } from '../utils/utils';
+import { ListView, CalendarEvent, WeekStart } from '../utils/utils';
 import { StateService } from './state.service';
+import { ConfigService } from './config.service';
 
 @Injectable({
   providedIn: 'root',
 })
 export class EventGroupingService {
-  constructor(private stateService: StateService) {}
+  private weekStartsOn: WeekStart = this.configService.getWeekStartOn();
+
+  constructor(
+    private stateService: StateService,
+    private configService: ConfigService
+  ) {}
 
   /**
    * Group events by date based on the current list view
@@ -173,35 +182,20 @@ export class EventGroupingService {
     viewDate: Date,
     append: 'previous' | 'next' | 'none' = 'none'
   ): Date[] {
-    const targetYear = this.getTargetYear(viewDate, append);
+    const targetYear = this.getTargetYear(viewDate, append); // Get the ISO year for the provided date
+    const numberOfWeeks = getISOWeeksInYear(new Date(targetYear, 0, 1)); // Number of ISO weeks in the year
     const labels: Date[] = [];
 
-    const firstDayOfYear = startOfYear(new Date(targetYear, 0, 1));
+    // Start from the first week of the ISO year
+    let startDate = startOfWeek(new Date(targetYear, 0, 4), {
+      weekStartsOn: this.weekStartsOn,
+    });
 
-    let startDate = firstDayOfYear;
-
-    if (startDate.getDay() !== 1) {
-      startDate = addWeeks(startDate, 1);
-      startDate.setDate(startDate.getDate() - startDate.getDay() + 1);
+    for (let i = 0; i < numberOfWeeks; i++) {
+      labels.push(startDate);
+      startDate = addWeeks(startDate, 1); // Move to the next week
     }
-
-    const weeksToGenerate = 52;
-
-    for (let i = 0; i < weeksToGenerate; i++) {
-      const weekDate = new Date(startDate);
-      weekDate.setDate(startDate.getDate() + i * 7);
-
-      if (weekDate.getFullYear() !== targetYear) break;
-
-      const currentWeek = getISOWeek(weekDate);
-
-      if (
-        labels.length === 0 ||
-        currentWeek !== getISOWeek(labels[labels.length - 1])
-      ) {
-        labels.push(weekDate);
-      }
-    }
+    console.log(labels);
 
     return labels;
   }
@@ -284,7 +278,7 @@ export class EventGroupingService {
     );
 
     // Maximum number of items in the list
-    const maxItems = 500;
+    const maxItems = 300;
 
     // Update the last scrolled date in the StateService
 
@@ -301,7 +295,6 @@ export class EventGroupingService {
 
     // Ensure that the number of events does not exceed maxItems
     if (groupedEvents.length > maxItems) {
-      console.log('HELLO');
       if (append === 'previous') {
         groupedEvents = groupedEvents.slice(0, maxItems);
       } else {

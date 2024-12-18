@@ -8,6 +8,7 @@ import {
 } from '@angular/core';
 import { DatePipe } from '@angular/common';
 import { StateService } from '../service/state.service';
+import { ConfigService } from '../service/config.service';
 
 @Component({
   selector: 'app-date-picker',
@@ -29,9 +30,12 @@ export class DatePickerComponent {
 
   dayPickerViewMode: 'week' | 'month' = 'week';
 
+  weekStartsOn = this.configService.getWeekStartOn();
+
   constructor(
     public datePipe: DatePipe,
-    private calendarListStateService: StateService
+    private calendarListStateService: StateService,
+    private configService: ConfigService
   ) {}
 
   /*
@@ -69,6 +73,12 @@ export class DatePickerComponent {
 
   goToPreviousStep(dayPickerViewMode: 'week' | 'month'): void {
     this.changeStep.emit({ step: 'previous', dayPickerViewMode });
+  }
+
+  getAdjustedDayIndex(day: Date): number {
+    // Adjust the day index based on the weekStartsOn setting
+    const dayIndex = day.getDay();
+    return (dayIndex - this.weekStartsOn + 7) % 7;
   }
 
   goToNextStep(dayPickerViewMode: 'week' | 'month'): void {

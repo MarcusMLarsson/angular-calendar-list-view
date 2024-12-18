@@ -12,7 +12,7 @@ import {
 } from '@angular/core';
 import { StateService } from '../service/state.service';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
-import { events, ListView, CalendarEvent } from '../utils/utils';
+import { events, ListView, CalendarEvent, WeekStart } from '../utils/utils';
 import {
   Day,
   setYear,
@@ -24,6 +24,7 @@ import {
 import { DatePipe } from '@angular/common';
 import { EventGroupingService } from '../service/event-grouping.service';
 import { DatePickerService } from '../service/date-picker.service';
+import { ConfigService } from '../service/config.service';
 @Component({
   selector: 'app-smart',
   templateUrl: './smart.component.html',
@@ -38,7 +39,7 @@ export class SmartComponent implements OnChanges, OnInit, AfterViewInit {
   /**
    * Determines how events are grouped in the list view, either by day, week, or month.
    */
-  listView = ListView.Day;
+  listView = ListView.Week;
 
   /**
    * An array of events to display on view
@@ -69,15 +70,14 @@ export class SmartComponent implements OnChanges, OnInit, AfterViewInit {
 
   dayPickerViewMode: 'week' | 'month' = 'week';
 
-  weekStartsOn: Day | undefined;
-
   /*
    * Used to prevent that the scrollToSelectedDate method triggers onScroll
    */
   private isProgrammaticScroll = false;
 
-  private destroyRef = inject(DestroyRef);
+  private weekStartsOn: WeekStart = this.configService.getWeekStartOn();
 
+  private destroyRef = inject(DestroyRef);
   @ViewChild('scrollableContainer') scrollableContainer!: ElementRef;
   @ViewChild('referenceElement') referenceElement!: ElementRef;
 
@@ -86,20 +86,18 @@ export class SmartComponent implements OnChanges, OnInit, AfterViewInit {
     private datePipe: DatePipe,
     private cdr: ChangeDetectorRef,
     private eventGroupingService: EventGroupingService,
-    private datePickerService: DatePickerService
+    private datePickerService: DatePickerService,
+    private configService: ConfigService
   ) {}
 
   ngOnInit() {
     this.initializeSubscriptions();
 
     // Initialize the current week, month days, and day abbreviations to be displayed in the day picker
-    this.currentWeekDays = this.datePickerService.getWeekDays(this.viewDate, 0);
-    this.currentMonthDays = this.datePickerService.generateMonth(
-      this.viewDate,
-      0
-    );
+    this.currentWeekDays = this.datePickerService.getWeekDays(this.viewDate);
+    this.currentMonthDays = this.datePickerService.generateMonth(this.viewDate);
     this.dayOfWeekAbbreviations =
-      this.datePickerService.generateDayOfWeekAbbreviations(this.viewDate, 0);
+      this.datePickerService.generateDayOfWeekAbbreviations(this.viewDate);
   }
 
   ngOnChanges(changes: SimpleChanges): void {
@@ -187,8 +185,7 @@ export class SmartComponent implements OnChanges, OnInit, AfterViewInit {
 
       if (selectedDate < firstDay || selectedDate > lastDay) {
         this.currentMonthDays = this.datePickerService.generateMonth(
-          this.viewDate,
-          0
+          this.viewDate
         );
       }
     } else if (
@@ -203,8 +200,7 @@ export class SmartComponent implements OnChanges, OnInit, AfterViewInit {
 
       if (selectedDate < firstDay || selectedDate > lastDay) {
         this.currentWeekDays = this.datePickerService.getWeekDays(
-          this.viewDate,
-          0
+          this.viewDate
         );
       }
     }
@@ -256,8 +252,10 @@ export class SmartComponent implements OnChanges, OnInit, AfterViewInit {
             // Step 2: Set the week number
             date = setWeek(date, week); // Sets the ISO week to 50
 
-            // Step 3: Get the first day of the week (e.g., Monday as the start of the week)
-            fullDateString = `${startOfWeek(date, { weekStartsOn: 1 })}`;
+            // Step 3: Get the first day of the week
+            fullDateString = `${startOfWeek(date, {
+              weekStartsOn: this.weekStartsOn,
+            })}`;
           }
           // Day and month view
           else {
@@ -317,7 +315,9 @@ export class SmartComponent implements OnChanges, OnInit, AfterViewInit {
     );
 
     if (this.listView === ListView.Week) {
-      const startOfWeekDate = startOfWeek(this.viewDate, { weekStartsOn: 1 });
+      const startOfWeekDate = startOfWeek(this.viewDate, {
+        weekStartsOn: this.weekStartsOn,
+      });
 
       // Reformat the start of the week date to match the date label format
       formattedSelectedDateLabel = format(startOfWeekDate, 'yyyy-MM-dd');
@@ -408,15 +408,11 @@ export class SmartComponent implements OnChanges, OnInit, AfterViewInit {
     if (event.dayPickerViewMode === 'month') {
       // Generate new month view when stepping
       this.currentMonthDays = this.datePickerService.generateMonth(
-        this.viewDate,
-        0
+        this.viewDate
       );
     } else if (event.dayPickerViewMode === 'week') {
       // Generate new week view when stepping
-      this.currentWeekDays = this.datePickerService.getWeekDays(
-        this.viewDate,
-        0
-      );
+      this.currentWeekDays = this.datePickerService.getWeekDays(this.viewDate);
     }
   }
 
@@ -428,7 +424,9 @@ export class SmartComponent implements OnChanges, OnInit, AfterViewInit {
     );
 
     if (this.listView === ListView.Week) {
-      const startOfWeekDate = startOfWeek(viewDate, { weekStartsOn: 1 });
+      const startOfWeekDate = startOfWeek(viewDate, {
+        weekStartsOn: this.weekStartsOn,
+      });
       formattedSelectedDateLabel = format(startOfWeekDate, 'yyyy-MM-dd');
     } else if (this.listView === ListView.Month) {
       const startOfMonthDate = startOfMonth(viewDate);

@@ -18,7 +18,7 @@
 
       <ng-container *ngIf="listView === 'week'">
         <span class="date-header">
-          {{ eventGroup.dateLabel | weekNumber }}
+          W{{ eventGroup.dateLabel | date : "w" }}
         </span>
 
         <span class="date-sub-header">

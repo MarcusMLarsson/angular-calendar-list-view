@@ -9,14 +9,17 @@ import {
   addWeeks,
   subWeeks,
   addDays,
-  Day,
 } from 'date-fns';
+import { ConfigService } from './config.service';
+import { WeekStart } from '../utils/utils';
 
 @Injectable({
   providedIn: 'root',
 })
 export class DatePickerService {
-  constructor() {}
+  weekStartsOn: WeekStart = this.configService.getWeekStartOn();
+
+  constructor(private configService: ConfigService) {}
 
   /**
    * Step through months or weeks
@@ -40,11 +43,13 @@ export class DatePickerService {
   /**
    * Get the days of the current week based on the viewDate
    */
-  getWeekDays(
-    viewDate: Date,
-    weekStartsOn: Day | undefined
-  ): Array<{ date: Date; dayNumber: number }> {
-    const currentWeekStart = startOfWeek(viewDate, { weekStartsOn });
+  getWeekDays(viewDate: Date): Array<{ date: Date; dayNumber: number }> {
+    // Use date-fns startOfWeek with dynamic weekStartsOn value
+    const currentWeekStart = startOfWeek(viewDate, {
+      weekStartsOn: this.weekStartsOn,
+    });
+
+    // Correcting the days of the week to start from the desired day
     return Array.from({ length: 7 }, (_, dayIndex) => {
       const date = addDays(currentWeekStart, dayIndex);
       return {
@@ -58,18 +63,21 @@ export class DatePickerService {
    * Generate the days of the month
    */
   generateMonth(
-    viewDate: Date,
-    weekStartsOn: Day | undefined
+    viewDate: Date
   ): Array<Array<{ date: Date; dayNumber: number }>> {
+    // Calculate the start and end of the month
     const start = startOfMonth(viewDate);
     const end = endOfMonth(viewDate);
-    const startDate = startOfWeek(start, { weekStartsOn });
-    const endDate = endOfWeek(end, { weekStartsOn });
+
+    // Calculate the start and end of the week that contains the first and last day of the month
+    const startDate = startOfWeek(start, { weekStartsOn: this.weekStartsOn });
+    const endDate = endOfWeek(end, { weekStartsOn: this.weekStartsOn });
 
     let date = startDate;
     const weeks: Array<Array<{ date: Date; dayNumber: number }>> = [];
     let week: Array<{ date: Date; dayNumber: number }> = [];
 
+    // Iterate through days from startDate to endDate, grouping by weeks
     while (date <= endDate) {
       week.push({ date: new Date(date), dayNumber: date.getDate() });
 
@@ -87,11 +95,13 @@ export class DatePickerService {
   /**
    * Generate abbreviated day names
    */
-  generateDayOfWeekAbbreviations(
-    viewDate: Date,
-    weekStartsOn: Day | undefined
-  ): string[] {
-    const weekStart = startOfWeek(viewDate, { weekStartsOn });
+  generateDayOfWeekAbbreviations(viewDate: Date): string[] {
+    // Get the start of the week based on the viewDate and weekStartsOn
+    const weekStart = startOfWeek(viewDate, {
+      weekStartsOn: this.weekStartsOn,
+    });
+
+    // Generate abbreviated day names based on the start of the week
     return Array.from({ length: 7 }, (_, i) => {
       const day = addDays(weekStart, i);
       return day.toLocaleDateString('en-US', { weekday: 'short' });

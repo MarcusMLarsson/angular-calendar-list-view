@@ -8,7 +8,7 @@
         {{
           dayPickerViewMode === "month"
             ? (viewDate | date : "MMMM yyyy")
-            : (viewDate | weekNumber) + ", " + (viewDate | date : "yyyy")
+            : "W" + (viewDate | date : "w") + ", " + (viewDate | date : "yyyy")
         }}
       </span>
       <div class="material-icons" (click)="goToNextStep(dayPickerViewMode)">
@@ -30,7 +30,7 @@
       <div class="week-view">
         <div *ngFor="let day of currentWeekDays">
           <div class="day-label-week-view">
-            {{ dayOfWeekAbbreviations[day.date.getDay()] }}
+            {{ dayOfWeekAbbreviations[getAdjustedDayIndex(day.date)] }}
           </div>
           <div
             class="day-of-the-week"

@@ -9,6 +9,7 @@ import {
 import { DatePipe } from '@angular/common';
 import { StateService } from '../service/state.service';
 import { ConfigService } from '../service/config.service';
+import { DatePickerService } from '../service/date-picker.service';
 
 @Component({
   selector: 'app-date-picker',
@@ -35,7 +36,8 @@ export class DatePickerComponent {
   constructor(
     public datePipe: DatePipe,
     private calendarListStateService: StateService,
-    private configService: ConfigService
+    private configService: ConfigService,
+    private datePickerService: DatePickerService
   ) {}
 
   /*
@@ -46,6 +48,8 @@ export class DatePickerComponent {
       this.dayPickerViewMode === 'week' ? 'month' : 'week';
 
     this.viewModeChange.emit(this.dayPickerViewMode);
+
+    this.currentMonthDays = this.datePickerService.generateMonth(this.viewDate);
   }
 
   /*

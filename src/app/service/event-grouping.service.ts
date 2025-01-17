@@ -195,7 +195,6 @@ export class EventGroupingService {
       labels.push(startDate);
       startDate = addWeeks(startDate, 1); // Move to the next week
     }
-    console.log(labels);
 
     return labels;
   }
@@ -244,13 +243,14 @@ export class EventGroupingService {
     currentDate: Date,
     append: 'previous' | 'next' | 'none' = 'none'
   ): number {
+    const currentYear = getISOWeekYear(currentDate); // ISO year of the current date
     switch (append) {
       case 'previous':
-        return currentDate.getFullYear() - 1;
+        return getISOWeekYear(subMonths(currentDate, 1)); // Adjust by one month backward
       case 'next':
-        return currentDate.getFullYear() + 1;
+        return getISOWeekYear(addMonths(currentDate, 1)); // Adjust by one month forward
       default:
-        return currentDate.getFullYear();
+        return currentYear;
     }
   }
 

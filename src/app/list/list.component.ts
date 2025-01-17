@@ -1,5 +1,5 @@
 import { Component, Input, Output, EventEmitter } from '@angular/core';
-import { ListView, CalendarEvent } from '../utils/utils';
+import { CalendarEvent } from '../utils/utils';
 
 @Component({
   selector: 'app-list',
@@ -17,11 +17,6 @@ export class ListComponent {
    * The schema is available here: https://github.com/mattlewis92/calendar-utils/blob/c51689985f59a271940e30bc4e2c4e1fee3fcb5c/src/calendarUtils.ts#L49-L63
    */
   @Input() events: CalendarEvent[] = [];
-
-  /**
-   * Determines how events are grouped in the list view, either by day, week, or month.
-   */
-  @Input() listView: ListView = ListView.Day;
 
   /**
    *  Emits the event when clicking on an event in the list view

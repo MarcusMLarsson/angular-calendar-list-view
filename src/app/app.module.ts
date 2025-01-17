@@ -11,7 +11,7 @@ import { IsSelectedDayPipe } from './pipes/is-selected-day/is-selected-day.pipe'
 import { MatIconModule } from '@angular/material/icon';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 import { ScrollingModule } from '@angular/cdk/scrolling';
-import { IsSameMonthPipe } from './pipes/is-same-month.pipe';
+import { IsSameMonthPipe } from './pipes/is-same-month/is-same-month.pipe';
 
 @NgModule({
   declarations: [

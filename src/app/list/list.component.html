@@ -6,35 +6,13 @@
   >
     <!-- Period label -->
     <div class="date-header-container">
-      <ng-container *ngIf="listView === 'day'">
-        <span class="date-header">
-          {{ eventGroup.dateLabel | date : "EEEE d" }}
-        </span>
+      <span class="date-header">
+        {{ eventGroup.dateLabel | date : "EEEE d" : "Europe/Stockholm" }}
+      </span>
 
-        <span class="date-sub-header">
-          {{ eventGroup.dateLabel | date : "MMM YYYY" }}
-        </span>
-      </ng-container>
-
-      <ng-container *ngIf="listView === 'week'">
-        <span class="date-header">
-          W{{ eventGroup.dateLabel | date : "w" }}
-        </span>
-
-        <span class="date-sub-header">
-          {{ eventGroup.dateLabel | date : "MMM YYYY" }}
-        </span>
-      </ng-container>
-
-      <ng-container *ngIf="listView === 'month'">
-        <span class="date-header">
-          {{ eventGroup.dateLabel | date : "MMMM" }}
-        </span>
-
-        <span class="date-sub-header">
-          {{ eventGroup.dateLabel | date : "YYYY" }}
-        </span>
-      </ng-container>
+      <span class="date-sub-header">
+        {{ eventGroup.dateLabel | date : "MMM yyyy" : "Europe/Stockholm" }}
+      </span>
     </div>
 
     <!-- No event for period -->

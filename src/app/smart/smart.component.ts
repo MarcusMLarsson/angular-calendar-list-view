@@ -12,21 +12,12 @@ import {
 } from '@angular/core';
 import { StateService } from '../service/state.service';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
-import { events, ListView, CalendarEvent, WeekStart } from '../utils/utils';
-import {
-  Day,
-  setYear,
-  setWeek,
-  startOfWeek,
-  format,
-  startOfMonth,
-  startOfYear,
-} from 'date-fns';
+import { events, CalendarEvent } from '../utils/utils';
+import { startOfMonth } from 'date-fns';
 import { DatePipe } from '@angular/common';
 import { EventGroupingService } from '../service/event-grouping.service';
 import { DatePickerService } from '../service/date-picker.service';
 import { ConfigService } from '../service/config.service';
-import { last } from 'rxjs';
 @Component({
   selector: 'app-smart',
   templateUrl: './smart.component.html',
@@ -37,11 +28,6 @@ export class SmartComponent implements OnChanges, OnInit, AfterViewInit {
    * The current view date
    */
   viewDate: Date = new Date();
-
-  /**
-   * Determines how events are grouped in the list view, either by day, week, or month.
-   */
-  listView = ListView.Week;
 
   /**
    * An array of events to display on view
@@ -77,8 +63,6 @@ export class SmartComponent implements OnChanges, OnInit, AfterViewInit {
    */
   private isProgrammaticScroll = false;
 
-  private weekStartsOn: WeekStart = this.configService.getWeekStartOn();
-
   private destroyRef = inject(DestroyRef);
   @ViewChild('scrollableContainer') scrollableContainer!: ElementRef;
   @ViewChild('referenceElement') referenceElement!: ElementRef;
@@ -103,11 +87,10 @@ export class SmartComponent implements OnChanges, OnInit, AfterViewInit {
   }
 
   ngOnChanges(changes: SimpleChanges): void {
-    if (changes['events'] || changes['listView']) {
+    if (changes['events']) {
       // recalculate the grouped events when the events or listView changes
       this.groupedEventsByDate = this.eventGroupingService.groupEventsByDate(
         this.events,
-        this.listView,
         this.viewDate
       );
     }
@@ -132,7 +115,6 @@ export class SmartComponent implements OnChanges, OnInit, AfterViewInit {
         this.viewDate = date;
         this.groupedEventsByDate = this.eventGroupingService.groupEventsByDate(
           this.events,
-          this.listView,
           this.viewDate
         );
 
@@ -163,13 +145,7 @@ export class SmartComponent implements OnChanges, OnInit, AfterViewInit {
     this.calendarListStateService.lastScrolledDate$
       .pipe(takeUntilDestroyed(this.destroyRef))
       .subscribe((lastScrolledDate) => {
-        if (ListView.Day === this.listView) {
-          this.scrollToDate(startOfMonth(lastScrolledDate));
-        }
-        if (ListView.Week === this.listView) {
-          //bugged
-          this.scrollToDate(startOfYear(lastScrolledDate));
-        }
+        this.scrollToDate(startOfMonth(lastScrolledDate));
       });
   }
 
@@ -249,26 +225,7 @@ export class SmartComponent implements OnChanges, OnInit, AfterViewInit {
           let fullDateString = '';
           // Combine the weekday and month-year label parts into a full date.
 
-          // Week view
-          if (this.listView === ListView.Week) {
-            fullDateString = `${weekdayHeader} ${monthYearHeader}`;
-            const week = Number(weekdayHeader.split('W')[1]);
-            const year = Number(monthYearHeader.split(' ')[1]); // Parse year as a number
-
-            let date = setYear(new Date(), year); // Sets the year to 2024
-
-            // Step 2: Set the week number
-            date = setWeek(date, week); // Sets the ISO week to 50
-
-            // Step 3: Get the first day of the week
-            fullDateString = `${startOfWeek(date, {
-              weekStartsOn: this.weekStartsOn,
-            })}`;
-          }
-          // Day and month view
-          else {
-            fullDateString = `${weekdayHeader} ${monthYearHeader}`;
-          }
+          fullDateString = `${weekdayHeader} ${monthYearHeader}`;
 
           const parsedDate = new Date(fullDateString);
 
@@ -289,7 +246,6 @@ export class SmartComponent implements OnChanges, OnInit, AfterViewInit {
       this.groupedEventsByDate = this.eventGroupingService.loadMoreEvents(
         this.events,
         this.groupedEventsByDate,
-        this.listView,
         this.viewDate,
         'previous'
       );
@@ -301,7 +257,6 @@ export class SmartComponent implements OnChanges, OnInit, AfterViewInit {
       this.groupedEventsByDate = this.eventGroupingService.loadMoreEvents(
         this.events,
         this.groupedEventsByDate,
-        this.listView,
         this.viewDate,
         'next'
       );
@@ -322,19 +277,6 @@ export class SmartComponent implements OnChanges, OnInit, AfterViewInit {
       'yyyy-MM-dd'
     );
 
-    if (this.listView === ListView.Week) {
-      const startOfWeekDate = startOfWeek(this.viewDate, {
-        weekStartsOn: this.weekStartsOn,
-      });
-
-      // Reformat the start of the week date to match the date label format
-      formattedSelectedDateLabel = format(startOfWeekDate, 'yyyy-MM-dd');
-    } else if (this.listView === ListView.Month) {
-      const startOfMonthDate = startOfMonth(this.viewDate);
-
-      formattedSelectedDateLabel = format(startOfMonthDate, 'yyyy-MM-dd');
-    }
-
     // Find the DOM element that matches the selected date label
     const dateElement = document.getElementById(
       'date-' + formattedSelectedDateLabel
@@ -348,7 +290,6 @@ export class SmartComponent implements OnChanges, OnInit, AfterViewInit {
         this.groupedEventsByDate = this.eventGroupingService.loadMoreEvents(
           this.events,
           this.groupedEventsByDate,
-          this.listView,
           this.viewDate,
           'previous'
         );
@@ -357,7 +298,6 @@ export class SmartComponent implements OnChanges, OnInit, AfterViewInit {
         this.groupedEventsByDate = this.eventGroupingService.loadMoreEvents(
           this.events,
           this.groupedEventsByDate,
-          this.listView,
           this.viewDate,
           'next'
         );
@@ -430,16 +370,6 @@ export class SmartComponent implements OnChanges, OnInit, AfterViewInit {
       viewDate,
       'yyyy-MM-dd'
     );
-
-    if (this.listView === ListView.Week) {
-      const startOfWeekDate = startOfWeek(viewDate, {
-        weekStartsOn: this.weekStartsOn,
-      });
-      formattedSelectedDateLabel = format(startOfWeekDate, 'yyyy-MM-dd');
-    } else if (this.listView === ListView.Month) {
-      const startOfMonthDate = startOfMonth(viewDate);
-      formattedSelectedDateLabel = format(startOfMonthDate, 'yyyy-MM-dd');
-    }
 
     // Find the DOM element that matches the selected date label
     const dateElement = document.getElementById(

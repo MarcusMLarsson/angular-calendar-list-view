@@ -3,12 +3,9 @@ import {
   addMonths,
   addWeeks,
   getISOWeek,
-  startOfYear,
   subMonths,
-  startOfMonth,
   startOfWeek,
   getISOWeekYear,
-  getYear,
   getISOWeeksInYear,
 } from 'date-fns';
 import { ListView, CalendarEvent, WeekStart } from '../utils/utils';
@@ -283,8 +280,7 @@ export class EventGroupingService {
     // Update the last scrolled date in the StateService
 
     if (append === 'previous') {
-      // Adjust the viewDate to the previous period (e.g., previous month)
-      this.stateService.setLastScrolledDate(startOfMonth(viewDate));
+      this.stateService.setLastScrolledDate(viewDate);
       viewDate = subMonths(viewDate, 1);
       groupedEvents = [...newGroupedEvents, ...groupedEvents];
     } else if (append === 'next') {

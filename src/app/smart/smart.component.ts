@@ -20,11 +20,13 @@ import {
   startOfWeek,
   format,
   startOfMonth,
+  startOfYear,
 } from 'date-fns';
 import { DatePipe } from '@angular/common';
 import { EventGroupingService } from '../service/event-grouping.service';
 import { DatePickerService } from '../service/date-picker.service';
 import { ConfigService } from '../service/config.service';
+import { last } from 'rxjs';
 @Component({
   selector: 'app-smart',
   templateUrl: './smart.component.html',
@@ -39,7 +41,7 @@ export class SmartComponent implements OnChanges, OnInit, AfterViewInit {
   /**
    * Determines how events are grouped in the list view, either by day, week, or month.
    */
-  listView = ListView.Day;
+  listView = ListView.Week;
 
   /**
    * An array of events to display on view
@@ -161,7 +163,13 @@ export class SmartComponent implements OnChanges, OnInit, AfterViewInit {
     this.calendarListStateService.lastScrolledDate$
       .pipe(takeUntilDestroyed(this.destroyRef))
       .subscribe((lastScrolledDate) => {
-        this.scrollToDate(lastScrolledDate);
+        if (ListView.Day === this.listView) {
+          this.scrollToDate(startOfMonth(lastScrolledDate));
+        }
+        if (ListView.Week === this.listView) {
+          //bugged
+          this.scrollToDate(startOfYear(lastScrolledDate));
+        }
       });
   }
 

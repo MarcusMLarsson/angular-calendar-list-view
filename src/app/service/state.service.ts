@@ -49,8 +49,6 @@ export class StateService {
    * @param date The last scrolled date in the list view.
    */
   setLastScrolledDate(date: Date): void {
-    if (this.lastScrolledDate.value.getTime() !== date.getTime()) {
-      this.lastScrolledDate.next(date);
-    }
+    this.lastScrolledDate.next(date);
   }
 }

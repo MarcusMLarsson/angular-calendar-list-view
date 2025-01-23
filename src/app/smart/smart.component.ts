@@ -18,6 +18,7 @@ import { DatePipe } from '@angular/common';
 import { EventGroupingService } from '../service/event-grouping.service';
 import { DatePickerService } from '../service/date-picker.service';
 import { ConfigService } from '../service/config.service';
+import { filter, merge, tap, withLatestFrom } from 'rxjs';
 @Component({
   selector: 'app-smart',
   templateUrl: './smart.component.html',
@@ -36,8 +37,7 @@ export class SmartComponent implements OnChanges, OnInit, AfterViewInit {
   events: CalendarEvent[] = events;
 
   /**
-   * The list of events grouped by date
-   * grouped according to the listView
+   * The list of events grouped daily
    */
   groupedEventsByDate: { dateLabel: Date; events: CalendarEvent[] }[] = [];
 
@@ -56,6 +56,9 @@ export class SmartComponent implements OnChanges, OnInit, AfterViewInit {
    */
   dayOfWeekAbbreviations: string[] = [];
 
+  /*
+   * The current view mode of the day picker
+   */
   dayPickerViewMode: 'week' | 'month' = 'week';
 
   /*
@@ -64,8 +67,6 @@ export class SmartComponent implements OnChanges, OnInit, AfterViewInit {
   private isProgrammaticScroll = false;
 
   private destroyRef = inject(DestroyRef);
-  @ViewChild('scrollableContainer') scrollableContainer!: ElementRef;
-  @ViewChild('referenceElement') referenceElement!: ElementRef;
 
   constructor(
     private calendarListStateService: StateService,
@@ -88,7 +89,7 @@ export class SmartComponent implements OnChanges, OnInit, AfterViewInit {
 
   ngOnChanges(changes: SimpleChanges): void {
     if (changes['events']) {
-      // recalculate the grouped events when the events or listView changes
+      // recalculate the grouped events when event changes
       this.groupedEventsByDate = this.eventGroupingService.groupEventsByDate(
         this.events,
         this.viewDate
@@ -98,16 +99,15 @@ export class SmartComponent implements OnChanges, OnInit, AfterViewInit {
 
   ngAfterViewInit(): void {
     // Scrolls to today's date when the component is initialized
+    // Offset by 5 pixels to avoid needing to scroll down and back up to trigger the scroll
     this.scrollToDate(this.viewDate, 5);
   }
 
-  private initializeSubscriptions(): void {
-    // Create a flag to track recent day picker interaction
-    // Needed since both the scroll and the day picker update the selected date, which can cause conflicts
+  initializeSubscriptions(): void {
     // If the day picker was recently used, the day picker selected date should take priority
     let dayPickerPriority = false;
-    let firstRun = true;
 
+    // Listen to when users select a date in the day picker
     this.calendarListStateService.dayPickerSelectedDate$
       .pipe(takeUntilDestroyed(this.destroyRef))
       .subscribe((date: Date) => {
@@ -120,18 +120,15 @@ export class SmartComponent implements OnChanges, OnInit, AfterViewInit {
 
         this.cdr.detectChanges();
 
-        if (!firstRun) {
-          this.scrollToSelectedDate();
-        }
+        this.scrollToSelectedDate();
 
-        firstRun = false;
         // Reset priority after a short delay
         setTimeout(() => {
           dayPickerPriority = false;
         }, 500);
       });
 
-    // Scroll stream
+    // Listen to when users scroll in the list view
     this.calendarListStateService.listViewScrolledDate$
       .pipe(takeUntilDestroyed(this.destroyRef))
       .subscribe((date: Date) => {
@@ -318,7 +315,6 @@ export class SmartComponent implements OnChanges, OnInit, AfterViewInit {
         });
       }
     } else {
-      // Get reference to the scroll container
       const listViewContainer = document.querySelector('.scroll-container');
 
       if (dateElement && listViewContainer) {
@@ -335,33 +331,6 @@ export class SmartComponent implements OnChanges, OnInit, AfterViewInit {
     setTimeout(() => {
       this.isProgrammaticScroll = false;
     }, 200);
-  }
-
-  /*
-   * Step back or forward in the stepper in the the day picker
-   */
-  onChangeStep(event: {
-    step: 'next' | 'previous';
-    dayPickerViewMode: 'week' | 'month';
-  }): void {
-    const direction = event.step === 'next' ? 'next' : 'previous';
-
-    // Navigate the date based on direction and expansion status
-    this.viewDate = this.datePickerService.navigateDate(
-      this.viewDate,
-      direction,
-      event.dayPickerViewMode
-    );
-
-    if (event.dayPickerViewMode === 'month') {
-      // Generate new month view when stepping
-      this.currentMonthDays = this.datePickerService.generateMonth(
-        this.viewDate
-      );
-    } else if (event.dayPickerViewMode === 'week') {
-      // Generate new week view when stepping
-      this.currentWeekDays = this.datePickerService.getWeekDays(this.viewDate);
-    }
   }
 
   private scrollToDate(viewDate: Date, offset: number = 0): void {
@@ -392,6 +361,33 @@ export class SmartComponent implements OnChanges, OnInit, AfterViewInit {
           }
         }, 0);
       });
+    }
+  }
+
+  /*
+   * Step back or forward in the stepper in the the day picker
+   */
+  onChangeStep(event: {
+    step: 'next' | 'previous';
+    dayPickerViewMode: 'week' | 'month';
+  }): void {
+    const direction = event.step === 'next' ? 'next' : 'previous';
+
+    // Navigate the date based on direction and expansion status
+    this.viewDate = this.datePickerService.navigateDate(
+      this.viewDate,
+      direction,
+      event.dayPickerViewMode
+    );
+
+    if (event.dayPickerViewMode === 'month') {
+      // Generate new month view when stepping
+      this.currentMonthDays = this.datePickerService.generateMonth(
+        this.viewDate
+      );
+    } else if (event.dayPickerViewMode === 'week') {
+      // Generate new week view when stepping
+      this.currentWeekDays = this.datePickerService.getWeekDays(this.viewDate);
     }
   }
 

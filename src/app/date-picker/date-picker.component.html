@@ -1,45 +1,42 @@
-<div class="calendar-container">
-  <div class="calendar-header-container">
-    <div class="stepper-container">
-      <div class="material-icons" (click)="goToPreviousStep(dayPickerViewMode)">
-        chevron_left
-      </div>
-      <span class="calendar-header">
-        {{
-          dayPickerViewMode === "month"
-            ? (viewDate | date : "MMMM yyyy")
-            : "W" + (viewDate | date : "w") + ", " + (viewDate | date : "yyyy")
-        }}
-      </span>
-      <div class="material-icons" (click)="goToNextStep(dayPickerViewMode)">
-        chevron_right
-      </div>
-    </div>
-    <span class="toggle-icon" (click)="toggleView()">
-      <mat-icon>{{
-        dayPickerViewMode === "month"
-          ? "keyboard_arrow_down"
-          : "keyboard_arrow_up"
-      }}</mat-icon>
-    </span>
-  </div>
-
-  {{ viewDate }}
-
+<div class="calendar-container" #calendar>
   <!-- Week view -->
   <ng-container *ngIf="dayPickerViewMode === 'week'">
     <div class="week-container">
       <div class="week-view">
-        <div *ngFor="let day of currentWeekDays">
+        <div *ngFor="let day of currentWeekDays; trackBy: trackByDate">
           <div class="day-label-week-view">
             {{ dayOfWeekAbbreviations[getAdjustedDayIndex(day.date)] }}
           </div>
           <div
             class="day-of-the-week"
-            [class.selected]="day.date | isSelectedDay : viewDate"
-            (click)="onDateClick(day.date)"
+            [class.selected]="day.date | isSelectedDay : selectedDate"
+            [class.today]="
+              isToday(day.date) && !(day.date | isSelectedDay : viewDate)
+            "
+            (touchend)="onDateClick(day.date)"
           >
-            {{ day.dayNumber }}
+            <div class="day-content">
+              <div
+                class="first-day-of-month"
+                *ngIf="
+                  day.dayNumber === 1 && !(day.date | isSelectedDay : viewDate)
+                "
+              >
+                {{ day.date | date : "MMM" }}
+              </div>
+              <div>
+                {{ day.dayNumber }}
+              </div>
+              <div class="booking-indicators">
+                <div
+                  class="booking-indicator"
+                  *ngFor="
+                    let indicator of getIndicatorCount(day.date);
+                    let i = index
+                  "
+                ></div>
+              </div>
+            </div>
           </div>
         </div>
       </div>
@@ -50,22 +47,52 @@
   <ng-container *ngIf="dayPickerViewMode === 'month'">
     <div class="month-container">
       <div class="day-label-month-view">
-        <div *ngFor="let day of dayOfWeekAbbreviations">{{ day }}</div>
+        <div *ngFor="let day of dayOfWeekAbbreviations; trackBy: trackByIndex">
+          {{ day }}
+        </div>
       </div>
       <div class="week-row" *ngFor="let week of currentMonthDays">
         <div
           class="day-of-the-month"
           *ngFor="let day of week"
-          (click)="onDateClick(day.date)"
+          (touchend)="onDateClick(day.date)"
         >
           <div
-            [class.selected]="day.date | isSelectedDay : viewDate"
+            class="day-of-the-month"
+            [class.selected]="day.date | isSelectedDay : selectedDate"
+            [class.today]="
+              isToday(day.date) && !(day.date | isSelectedDay : viewDate)
+            "
             [class.other-month]="!(day.date | isSameMonth : viewDate)"
           >
-            {{ day.dayNumber }}
+            <div class="day-content">
+              <div
+                class="first-day-of-month"
+                *ngIf="
+                  day.dayNumber === 1 && !(day.date | isSelectedDay : viewDate)
+                "
+              >
+                {{ day.date | date : "MMM" }}
+              </div>
+              <div>
+                {{ day.dayNumber }}
+              </div>
+              <div class="booking-indicators">
+                <div
+                  class="booking-indicator"
+                  *ngFor="
+                    let indicator of getIndicatorCount(day.date);
+                    let i = index
+                  "
+                ></div>
+              </div>
+            </div>
           </div>
         </div>
       </div>
     </div>
   </ng-container>
+  <div class="scroll-indicator-container">
+    <div class="scroll-indicator"></div>
+  </div>
 </div>

@@ -5,18 +5,21 @@
     </button>
     <app-date-picker
       [viewDate]="viewDate"
+      [selectedDate]="selectedDate"
       [dayOfWeekAbbreviations]="dayOfWeekAbbreviations"
       [currentWeekDays]="currentWeekDays"
       [currentMonthDays]="currentMonthDays"
+      [groupedEventsByDate]="groupedEventsByDate"
       (changeStep)="onChangeStep($event)"
       (viewModeChange)="onViewModeChange($event)"
     ></app-date-picker>
   </div>
   <app-list
     class="scroll-container"
-    (scroll)="onScroll()"
     [viewDate]="viewDate"
-    [events]="events"
     [groupedEventsByDate]="groupedEventsByDate"
+    (scroll)="onScroll()"
   ></app-list>
+  <!--   (bookingClicked)="onEventClick($event)"
+    (noEventsClicked)="onNoEventClicked($event)"-->
 </div>

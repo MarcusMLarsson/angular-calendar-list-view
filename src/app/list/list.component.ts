@@ -1,5 +1,17 @@
 import { Component, Input, Output, EventEmitter } from '@angular/core';
-import { CalendarEvent } from '../utils/utils';
+import { CalendarEvent, CalendarBooking, BookingStatus } from '../utils/utils';
+import { CommonModule } from '@angular/common';
+
+export const colors = {
+  yellow: {
+    primary: '#e3bc08',
+    secondary: '#FDF1BA',
+  },
+  gray: {
+    primary: '#e0e0e0',
+    secondary: '#f9f9f9',
+  },
+};
 
 @Component({
   selector: 'app-list',
@@ -13,31 +25,27 @@ export class ListComponent {
   @Input() viewDate!: Date;
 
   /**
-   * An array of events to display on view
-   * The schema is available here: https://github.com/mattlewis92/calendar-utils/blob/c51689985f59a271940e30bc4e2c4e1fee3fcb5c/src/calendarUtils.ts#L49-L63
-   */
-  @Input() events: CalendarEvent[] = [];
-
-  /**
    *  Emits the event when clicking on an event in the list view
    *  For example, you can use this event to open a dialog with event details.
    */
-  @Output() eventClicked = new EventEmitter<{
-    event: CalendarEvent;
-    sourceEvent: MouseEvent | KeyboardEvent;
-  }>();
+  @Output() bookingClicked = new EventEmitter<CalendarBooking>();
+
+  @Output() noEventsClicked = new EventEmitter<Date>();
 
   @Input() groupedEventsByDate!: {
     dateLabel: Date;
     events: CalendarEvent[];
   }[];
 
-  // Emits the event when clicking on an event in the list view
-  onEventClick(
-    event: CalendarEvent,
-    sourceEvent: MouseEvent | KeyboardEvent
-  ): void {
-    // TODO: Implement functionality to open a dialog with event details.
-    this.eventClicked.emit({ event, sourceEvent });
+  onEventClick(booking: CalendarBooking): void {
+    this.bookingClicked.emit(booking);
   }
+
+  onNoEventsClick(dateLabel: string): void {
+    const date = new Date(dateLabel);
+    this.noEventsClicked.emit(date);
+  }
+
+  colors = colors;
+  bookingStatus = BookingStatus;
 }

@@ -19,6 +19,7 @@ export interface CalendarEvent<MetaType = any> {
   };
   draggable?: boolean;
   meta?: MetaType;
+  bookingStatus?: any;
 }
 
 export interface EventColor {
@@ -54,6 +55,22 @@ export const colors: any = {
     secondary: '#FDF1BA',
   },
 };
+
+export interface CalendarBooking {
+  id: number;
+  facilityId: number;
+  userId: number;
+  start: Date;
+  end: Date;
+  title: string;
+  name: string;
+  bookingStatus: string;
+}
+
+export enum BookingStatus {
+  Historical = 'historical',
+  Active = 'active',
+}
 
 export const events: CalendarEvent[] = [
   {

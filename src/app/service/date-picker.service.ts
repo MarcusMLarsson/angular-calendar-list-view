@@ -10,16 +10,12 @@ import {
   subWeeks,
   addDays,
 } from 'date-fns';
-import { ConfigService } from './config.service';
-import { WeekStart } from '../utils/utils';
 
 @Injectable({
   providedIn: 'root',
 })
 export class DatePickerService {
-  weekStartsOn: WeekStart = this.configService.getWeekStartOn();
-
-  constructor(private configService: ConfigService) {}
+  weekStartsOn: any = 1;
 
   /**
    * Step through months or weeks
@@ -104,7 +100,7 @@ export class DatePickerService {
     // Generate abbreviated day names based on the start of the week
     return Array.from({ length: 7 }, (_, i) => {
       const day = addDays(weekStart, i);
-      return day.toLocaleDateString('en-US', { weekday: 'short' });
+      return day.toLocaleDateString('sv-SE', { weekday: 'narrow' });
     });
   }
 }

@@ -3,4 +3,5 @@ body {
   font-style: normal;
   height: 100%; /* Ensure the html and body take full height */
   margin: 0; /* Remove default margins */
+  overscroll-behavior-y: contain; /* Prevents pull down to refresh in chrome */
 }

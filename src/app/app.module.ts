@@ -12,6 +12,8 @@ import { MatIconModule } from '@angular/material/icon';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 import { ScrollingModule } from '@angular/cdk/scrolling';
 import { IsSameMonthPipe } from './pipes/is-same-month/is-same-month.pipe';
+import { SvgIconComponent } from './svg-icon/svg-icon.component';
+import { HttpClientModule } from '@angular/common/http';
 
 @NgModule({
   declarations: [
@@ -19,6 +21,7 @@ import { IsSameMonthPipe } from './pipes/is-same-month/is-same-month.pipe';
     SmartComponent,
     ListComponent,
     DatePickerComponent,
+    SvgIconComponent,
     IsSelectedDayPipe,
     IsSameMonthPipe,
   ],
@@ -28,6 +31,7 @@ import { IsSameMonthPipe } from './pipes/is-same-month/is-same-month.pipe';
     MatIconModule,
     BrowserAnimationsModule,
     ScrollingModule,
+    HttpClientModule,
   ],
   providers: [DatePipe],
   bootstrap: [AppComponent],

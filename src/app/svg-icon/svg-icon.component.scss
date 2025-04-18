@@ -1,0 +1,11 @@
+:host {
+  display: inline-block;
+}
+
+div {
+  &::ng-deep svg {
+    display: block;
+    height: 100%;
+    width: 100%;
+  }
+}

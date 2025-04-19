@@ -16,12 +16,7 @@
             (touchend)="onDateClick(day.date)"
           >
             <div class="day-content">
-              <div
-                class="first-day-of-month"
-                *ngIf="
-                  day.dayNumber === 1 && !(day.date | isSelectedDay : viewDate)
-                "
-              >
+              <div class="first-day-of-month" *ngIf="day.dayNumber === 1">
                 {{ day.date | date : "MMM" }}
               </div>
               <div>
@@ -68,12 +63,7 @@
             [class.other-month]="!(day.date | isSameMonth : viewDate)"
           >
             <div class="day-content">
-              <div
-                class="first-day-of-month"
-                *ngIf="
-                  day.dayNumber === 1 && !(day.date | isSelectedDay : viewDate)
-                "
-              >
+              <div class="first-day-of-month" *ngIf="day.dayNumber === 1">
                 {{ day.date | date : "MMM" }}
               </div>
               <div>

@@ -1,6 +1,5 @@
 import { Component, Input, Output, EventEmitter } from '@angular/core';
 import { CalendarEvent, CalendarBooking, BookingStatus } from '../utils/utils';
-import { CommonModule } from '@angular/common';
 
 export const colors = {
   yellow: {

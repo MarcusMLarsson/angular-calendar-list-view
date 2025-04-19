@@ -202,30 +202,23 @@ export class SmartComponent implements OnChanges, OnInit {
       const headerPosition = dateHeaderContainer.getBoundingClientRect();
 
       if (containerPosition && headerPosition.bottom >= containerPosition.top) {
-        // Extract weekday and month-year text from the container
-        const weekdayHeader = dateHeaderContainer
-          .querySelector('.date-header')
-          ?.textContent?.trim();
-        const monthYearHeader = dateHeaderContainer
-          .querySelector('.date-sub-header')
-          ?.textContent?.trim();
+        // Find the parent event-group-container which has the date ID
+        const eventGroupContainer = dateHeaderContainer.closest(
+          '.event-group-container'
+        );
 
-        if (weekdayHeader && monthYearHeader) {
-          let fullDateString = '';
-          // Combine the weekday and month-year label parts into a full date.
+        if (eventGroupContainer) {
+          const dateId = eventGroupContainer.id; // Format: "yyyy-MM-dd"
 
-          fullDateString = `${weekdayHeader} ${monthYearHeader}`;
+          if (dateId) {
+            // Parse the date from the ID
+            const parsedDate = new Date(dateId + 'T00:00:00'); // Add time part to create valid date
 
-          const parsedDate = parse(
-            fullDateString,
-            'EEE d MMM yyyy',
-            new Date()
-          );
-
-          if (parsedDate) {
+            // Set the date in your service
             this.calendarListStateService.setListViewTopDate(parsedDate);
           }
         }
+
         break;
       }
     }

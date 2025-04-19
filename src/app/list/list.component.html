@@ -7,11 +7,11 @@
     <!-- Period label -->
     <div class="date-header-container">
       <span class="date-header">
-        {{ eventGroup.dateLabel | date : "EEE d" : "Europe/Stockholm" }}
+        {{ eventGroup.dateLabel | date : "d MMM" : "Europe/Stockholm" }}
       </span>
 
       <span class="date-sub-header">
-        {{ eventGroup.dateLabel | date : "MMM yyyy" : "Europe/Stockholm" }}
+        {{ eventGroup.dateLabel | date : "EEEE" : "Europe/Stockholm" }}
       </span>
     </div>
 

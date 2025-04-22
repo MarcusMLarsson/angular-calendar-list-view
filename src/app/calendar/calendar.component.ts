@@ -20,51 +20,51 @@ import { ConfigService } from '../service/config.service';
   templateUrl: './calendar.component.html',
   styleUrls: ['./calendar.component.scss'],
 })
-export class SmartComponent implements OnChanges, OnInit, AfterViewInit {
+export class CalendarComponent implements OnChanges, OnInit, AfterViewInit {
   /**
-   * The current view date
+   * The current view date that is visible at the top of the list view and is also represented by a circle in the day picker
+   * The view date is changed when the user scrolls in the list view or when the user selects a date in the day picker
    */
   viewDate: Date = new Date();
 
-  selectedDate = new Date();
+  /**
+   * Updated when the user swipes (steps) in the day picker.
+   */
+  datePickerReferenceDate = new Date();
 
   /**
-   * An array of events to display on view
-   * The schema is available here: https://github.com/mattlewis92/calendar-utils/blob/c51689985f59a271940e30bc4e2c4e1fee3fcb5c/src/calendarUtils.ts#L49-L63
+   * The raw array of calendar events provided to this component.
+   * Developers should pass their events data using this format.
+   * Schema reference: https://github.com/mattlewis92/calendar-utils/blob/c51689985f59a271940e30bc4e2c4e1fee3fcb5c/src/calendarUtils.ts#L49-L63
    */
   events: CalendarEvent[] = events;
 
   /**
-   * The list of events grouped daily
+   * The list of events grouped by date for display in the calendar list view.
+   * This is derived from the raw `events` array and formatted internally by the component.
    */
   groupedEventsByDate: { dateLabel: Date; events: CalendarEvent[] }[] = [];
-
-  /*
-   * The current week days displayed in the day picker when not expanded
-   */
-  currentWeekDays: Array<{ date: Date; dayNumber: number }> = [];
-
-  /*
-   * The current month days displayed in the day picker when expanded
-   */
-  currentMonthDays: Array<Array<{ date: Date; dayNumber: number }>> = [];
 
   /*
    * The day of week abbreviations displayed in the day picker header
    */
   dayOfWeekAbbreviations: string[] = [];
 
+  /**
+   * The current week days displayed in the day picker when in week view (not expanded).
+   */
+  currentWeekDays: Array<{ date: Date; dayNumber: number }> = [];
+
+  /**
+   * The current month days displayed in the day picker when in month view (expanded).
+   * The month view is structured as an array of weeks, where each week is an array of days.
+   */
+  currentMonthDays: Array<Array<{ date: Date; dayNumber: number }>> = [];
+
   /*
    * The current view mode of the day picker
    */
   dayPickerViewMode: 'week' | 'month' = 'week';
-
-  /*
-   * Used to prevent that the scrollToSelectedDate method triggers onScroll
-   */
-  private isProgrammaticScroll = false;
-  private lastScrollTop = 0;
-  scrollingDown = false;
 
   private destroyRef = inject(DestroyRef);
 
@@ -106,13 +106,14 @@ export class SmartComponent implements OnChanges, OnInit, AfterViewInit {
   }
 
   initializeSubscriptions(): void {
-    // Listen to when users select a date in the mobile day picker
+    // Listen to when users select a date in the day picker
     this.calendarListStateService.dayPickerSelectedDate$
       .pipe(takeUntilDestroyed(this.destroyRef))
       .subscribe({
         next: (date: Date) => {
-          this.viewDate = date;
-          // Recalculate if the user selects a date outside the current list in the day picker
+          this.datePickerReferenceDate = this.viewDate = date;
+          // Need to recalculate the grouped events when the user selects a date outside the current list in the day picker
+          // TODO: Make sure it's not recalculated unnecessarily
           this.groupedEventsByDate =
             this.eventGroupingService.groupEventsByDate(
               this.events,
@@ -123,43 +124,31 @@ export class SmartComponent implements OnChanges, OnInit, AfterViewInit {
         error: (err) => {
           console.error('Error in dayPickerSelectedDate$:', err);
         },
-        complete: () => {},
       });
 
-    // Listen for the date currently visible at the top of the mobile list view
+    // Listen for the date currently visible at the top of the list view
     this.calendarListStateService.listViewTopDate$
       .pipe(takeUntilDestroyed(this.destroyRef))
       .subscribe({
         next: (date: Date) => {
-          //invalid date
-          this.selectedDate = this.viewDate = date;
+          this.viewDate = date;
           this.updateDatePickerOnScrollOutOfRange();
         },
         error: (err) => {
           console.error('Error in listViewTopDate$:', err);
         },
-        complete: () => {},
       });
   }
 
   /**
    * Checks if scroll is outside the date picker view
-   * and updates the view if needed.
+   * and updates the datepicker if needed.
    */
   private updateDatePickerOnScrollOutOfRange(): void {
-    if (
-      this.dayPickerViewMode === 'month' &&
-      this.currentMonthDays?.length > 0
-    ) {
-      const firstDay = new Date(this.currentMonthDays[0][0].date);
-      const lastDay = new Date(
-        this.currentMonthDays[this.currentMonthDays.length - 1][
-          this.currentMonthDays[this.currentMonthDays.length - 1].length - 1
-        ].date
-      );
+    const selectedDate = new Date(this.viewDate);
 
-      const selectedDate = new Date(this.viewDate);
-
+    if (this.dayPickerViewMode === 'month' && this.currentMonthDays?.length) {
+      const [firstDay, lastDay] = this.getMonthBoundaries();
       if (selectedDate < firstDay || selectedDate > lastDay) {
         this.currentMonthDays = this.datePickerService.generateMonth(
           this.viewDate
@@ -167,14 +156,9 @@ export class SmartComponent implements OnChanges, OnInit, AfterViewInit {
       }
     } else if (
       this.dayPickerViewMode === 'week' &&
-      this.currentWeekDays?.length > 0
+      this.currentWeekDays?.length
     ) {
-      const firstDay = new Date(this.currentWeekDays[0].date);
-      const lastDay = new Date(
-        this.currentWeekDays[this.currentWeekDays.length - 1].date
-      );
-      const selectedDate = new Date(this.viewDate);
-
+      const [firstDay, lastDay] = this.getWeekBoundaries();
       if (selectedDate < firstDay || selectedDate > lastDay) {
         this.currentWeekDays = this.datePickerService.getWeekDays(
           this.viewDate
@@ -191,123 +175,116 @@ export class SmartComponent implements OnChanges, OnInit, AfterViewInit {
     const scrollableContainer = document.querySelector('.scroll-container');
     if (!scrollableContainer) return;
 
-    const containerPosition = scrollableContainer.getBoundingClientRect();
-
-    // Select all date header containers
-    const dateHeaderContainers = scrollableContainer.querySelectorAll(
-      '.date-header-container'
+    const containerTop = scrollableContainer.getBoundingClientRect().top;
+    const headers = Array.from(
+      scrollableContainer.querySelectorAll('.date-header-container')
     );
 
-    for (let i = 0; i < dateHeaderContainers.length; i++) {
-      const dateHeaderContainer = dateHeaderContainers[i] as HTMLElement;
-
-      // Get position of the current header container
-      const headerPosition = dateHeaderContainer.getBoundingClientRect();
-
-      if (containerPosition && headerPosition.bottom >= containerPosition.top) {
-        // Find the parent event-group-container which has the date ID
-        const eventGroupContainer = dateHeaderContainer.closest(
-          '.event-group-container'
-        );
-
-        if (eventGroupContainer) {
-          const dateId = eventGroupContainer.id; // Format: "yyyy-MM-dd"
-
-          if (dateId) {
-            // Parse the date from the ID
-            const parsedDate = new Date(dateId + 'T00:00:00'); // Add time part to create valid date
-
-            // Set the date in your service
-            this.calendarListStateService.setListViewTopDate(parsedDate);
-          }
+    headers.some((header) => {
+      const headerEl = header as HTMLElement;
+      if (headerEl.getBoundingClientRect().bottom >= containerTop) {
+        const eventGroup = headerEl.closest('.event-group-container');
+        if (eventGroup?.id) {
+          this.calendarListStateService.setListViewTopDate(
+            new Date(eventGroup.id + 'T00:00:00')
+          );
         }
-
-        break;
+        return true; // stops iteration
       }
-    }
-
-    if (this.isProgrammaticScroll) return;
-
-    // Get the current scroll position
-    const scrollTop = scrollableContainer.scrollTop;
-
-    // Check if scrolling down
-    if (scrollTop > this.lastScrollTop) {
-      this.scrollingDown = true;
-    } else {
-      this.scrollingDown = false;
-    }
-
-    // Update last scroll position
-    this.lastScrollTop = scrollTop <= 0 ? 0 : scrollTop;
+      return false;
+    });
   }
 
-  /*
+  /**
    * Scrolls to the selected date in the calendar list view when a date is clicked in the day picker.
+   * Finds the element with ID matching the formatted date (yyyy-MM-dd) and scrolls it to the top
+   *
    */
   private scrollToSelectedDate(): void {
-    this.isProgrammaticScroll = true;
-    // Format the selected date to match the format of the date label in the list view
     const formattedSelectedDateLabel = this.datePipe.transform(
       this.viewDate,
       'yyyy-MM-dd'
-    ) as any;
+    );
+    if (!formattedSelectedDateLabel) return;
 
     const listViewContainer = document.querySelector('.scroll-container');
+    const dateElement = document.getElementById(formattedSelectedDateLabel);
 
-    // Function to scroll the selected date into view and check if the scroll was successful
-
-    const scrollIntoView = () => {
-      const dateElement = document.getElementById(formattedSelectedDateLabel);
-      if (dateElement && listViewContainer) {
-        // First scroll into view
-        dateElement.scrollIntoView({
-          behavior: 'instant',
-          block: 'start',
-        });
-      }
-    };
-
-    scrollIntoView();
-
-    setTimeout(() => {
-      this.isProgrammaticScroll = false;
-    }, 100);
+    if (dateElement && listViewContainer) {
+      dateElement.scrollIntoView({
+        behavior: 'instant',
+        block: 'start',
+      });
+    }
   }
 
-  /*
-   * Step back or forward in the stepper in the the mobile date picker
+  /**
+   * Handles navigation (swipe/step) actions in the date picker to move between weeks or months.
+   * Updates the reference date and regenerates the appropriate view (week/month) based on the navigation direction.
    */
   onChangeStep(event: {
     step: 'next' | 'previous';
     dayPickerViewMode: 'week' | 'month';
   }): void {
-    const direction = event.step === 'next' ? 'next' : 'previous';
-
-    // Navigate the date based on direction and expansion status
-    this.viewDate = this.datePickerService.navigateDate(
-      this.viewDate,
-      direction,
+    // Update reference date based on navigation direction
+    this.datePickerReferenceDate = this.datePickerService.navigateDate(
+      this.datePickerReferenceDate,
+      event.step,
       event.dayPickerViewMode
     );
 
+    // Regenerate the appropriate view
     if (event.dayPickerViewMode === 'month') {
-      // Generate new month view when stepping
       this.currentMonthDays = this.datePickerService.generateMonth(
-        this.viewDate
+        this.datePickerReferenceDate
       );
-    } else if (event.dayPickerViewMode === 'week') {
-      // Generate new week view when stepping
-      this.currentWeekDays = this.datePickerService.getWeekDays(this.viewDate);
+    } else {
+      this.currentWeekDays = this.datePickerService.getWeekDays(
+        this.datePickerReferenceDate
+      );
     }
   }
 
+  /**
+   * Event emitted from the date picker component to notify when the view mode changes
+   */
   onViewModeChange(viewMode: 'week' | 'month') {
     this.dayPickerViewMode = viewMode;
   }
 
+  /*
+   * Helper method that returns the first and last dates of the currently displayed month in the datepicker
+   */
+  private getMonthBoundaries(): [Date, Date] {
+    const month = this.currentMonthDays!;
+    const firstDay = new Date(month[0][0].date);
+    const lastRow = month[month.length - 1];
+    const lastDay = new Date(lastRow[lastRow.length - 1].date);
+    return [firstDay, lastDay];
+  }
+
+  /*
+   * Helper method that returns the first and last dates of the currently displayed week in the datepicker
+   */
+  private getWeekBoundaries(): [Date, Date] {
+    const week = this.currentWeekDays!;
+    const firstDay = new Date(week[0].date);
+    const lastDay = new Date(week[week.length - 1].date);
+    return [firstDay, lastDay];
+  }
+
+  /* Open the add event dialog */
   openAddEventDialog() {
-    // Implement logic to open your event creation dialog or form
     console.log('Open Add Event Dialog');
+  }
+
+  /* Open the edit event dialog */
+  onEventClick(event: any) {
+    console.log(event);
+  }
+
+  /* Open the add event dialog */
+  onNoEventClick(event: any) {
+    console.log(event);
   }
 }

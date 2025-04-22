@@ -1,25 +1,28 @@
 <div class="calendar-container">
-  <div class="desktop-container">
-    <button class="floating-action-button" (click)="openAddEventDialog()">
-      <app-svg-icon icon="plus_white"></app-svg-icon>
-    </button>
-    <app-date-picker
-      [viewDate]="viewDate"
-      [selectedDate]="selectedDate"
-      [dayOfWeekAbbreviations]="dayOfWeekAbbreviations"
-      [currentWeekDays]="currentWeekDays"
-      [currentMonthDays]="currentMonthDays"
-      [groupedEventsByDate]="groupedEventsByDate"
-      (changeStep)="onChangeStep($event)"
-      (viewModeChange)="onViewModeChange($event)"
-    ></app-date-picker>
-  </div>
+  <button
+    aria-label="Add event"
+    class="floating-action-button"
+    (click)="openAddEventDialog()"
+  >
+    <app-svg-icon icon="plus_white"></app-svg-icon>
+  </button>
+  <app-date-picker
+    [viewDate]="viewDate"
+    [dayOfWeekAbbreviations]="dayOfWeekAbbreviations"
+    [currentWeekDays]="currentWeekDays"
+    [currentMonthDays]="currentMonthDays"
+    [groupedEventsByDate]="groupedEventsByDate"
+    [datePickerReferenceDate]="datePickerReferenceDate"
+    (changeStep)="onChangeStep($event)"
+    (viewModeChange)="onViewModeChange($event)"
+  ></app-date-picker>
+
   <app-list
     class="scroll-container"
     [viewDate]="viewDate"
     [groupedEventsByDate]="groupedEventsByDate"
     (scroll)="onScroll()"
+    (eventClick)="onEventClick($event)"
+    (noEventsClick)="onNoEventClick($event)"
   ></app-list>
-  <!--   (bookingClicked)="onEventClick($event)"
-    (noEventsClicked)="onNoEventClicked($event)"-->
 </div>

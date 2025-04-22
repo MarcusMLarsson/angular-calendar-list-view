@@ -1,16 +1,16 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 
-import { SmartComponent } from './calendar.component';
+import { CalendarComponent } from './calendar.component';
 
-describe('SmartComponent', () => {
-  let component: SmartComponent;
-  let fixture: ComponentFixture<SmartComponent>;
+describe('CalendarComponent', () => {
+  let component: CalendarComponent;
+  let fixture: ComponentFixture<CalendarComponent>;
 
   beforeEach(() => {
     TestBed.configureTestingModule({
-      declarations: [SmartComponent],
+      declarations: [CalendarComponent],
     });
-    fixture = TestBed.createComponent(SmartComponent);
+    fixture = TestBed.createComponent(CalendarComponent);
     component = fixture.componentInstance;
     fixture.detectChanges();
   });

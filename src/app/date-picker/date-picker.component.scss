@@ -11,7 +11,7 @@
 
 .week-container,
 .month-container {
-  padding: 14px 6px 16px 0px;
+  padding: 14px 5px 16px 5px;
   opacity: 1;
   transform-origin: center;
   transition: transform 0.3s ease-in-out, opacity 0.3s ease-in-out;
@@ -182,7 +182,7 @@
 }
 
 .day-of-the-month div.selected {
-  background-color: #2778d5;
+  background-color: var(--ds-color-blue-70);
   color: white;
   border-radius: 50%;
   top: 0;
@@ -199,7 +199,7 @@
 }
 
 .day-of-the-week.selected {
-  background-color: #2778d5;
+  background-color: var(--ds-color-blue-70);
   color: white;
   transition: none !important;
 }

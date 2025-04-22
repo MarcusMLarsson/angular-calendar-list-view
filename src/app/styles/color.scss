@@ -1,0 +1,59 @@
+:root {
+  // Brand colors
+  --ds-color-brand-30: #a685ff;
+  --ds-color-brand-50: #7950e5;
+  --ds-color-brand-70: #4a2399;
+  --ds-color-brand-90: #351370;
+
+  // Purple colors
+  --ds-color-purple-10: #cac9fc;
+  --ds-color-purple-20: #bdb5ff;
+  --ds-color-purple-30: #8f86e6;
+  --ds-color-purple-70: #5d51b6;
+  --ds-color-purple-80: #393273;
+  --ds-color-purple-90: #211a4c;
+  --ds-color-purple-100: #1a1a2e;
+
+  // White colors and transparencies
+  --ds-color-white-5: rgb(255 255 255 / 5%);
+  --ds-color-white-10: hsla(0, 0%, 100%, 0.1);
+  --ds-color-white-20: hsla(0, 0%, 100%, 0.2);
+  --ds-color-white-40: hsla(0, 0%, 100%, 0.4);
+  --ds-color-white-60: hsla(0, 0%, 100%, 0.6);
+  --ds-color-white-80: hsla(0, 0%, 100%, 0.8);
+  --ds-color-white: #fff;
+
+  // Black colors and transparencies
+  --ds-color-black-10: rgb(0 0 0 / 10%);
+  --ds-color-black-20: rgb(0 0 0 / 20%);
+  --ds-color-black-30: rgb(0 0 0 / 30%);
+  --ds-color-black-40: rgb(0 0 0 / 40%);
+  --ds-color-black-50: rgb(0 0 0 / 50%);
+  --ds-color-black-60: rgb(0 0 0 / 60%);
+  --ds-color-black-70: rgb(0 0 0 / 70%);
+  --ds-color-black-80: rgb(0 0 0 / 80%);
+  --ds-color-black-90: rgb(0 0 0 / 90%);
+  --ds-color-black: #000;
+
+  // Blue colors
+  --ds-color-blue-20: #b3dbff;
+  --ds-color-blue-50: #47a9ff;
+  --ds-color-blue-70: #1e90ff;
+  --ds-color-blue-80: #0c5da7;
+
+  // Turquoise colors
+  --ds-color-turquoise-20: #7cffde;
+  --ds-color-turquoise-50: #3ae8bd;
+  --ds-color-turquoise-70: #0fb3a2;
+  --ds-color-turquoise-80: #0d7a7a;
+
+  // Other colors
+  --ds-color-green-50: #97e851;
+  --ds-color-green-80: #479440;
+  --ds-color-yellow-50: #fecd19;
+  --ds-color-yellow-80: #f79101;
+  --ds-color-orange-50: #ffa43d;
+  --ds-color-orange-80: #d06429;
+  --ds-color-red-50: #e94560;
+  --ds-color-red-80: #a52338;
+}

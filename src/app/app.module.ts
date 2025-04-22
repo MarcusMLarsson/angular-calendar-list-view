@@ -3,7 +3,7 @@ import { BrowserModule } from '@angular/platform-browser';
 
 import { AppRoutingModule } from './app-routing.module';
 import { AppComponent } from './app.component';
-import { SmartComponent } from './calendar/calendar.component';
+import { CalendarComponent } from './calendar/calendar.component';
 import { ListComponent } from './list/list.component';
 import { DatePickerComponent } from './date-picker/date-picker.component';
 import { DatePipe } from '@angular/common';
@@ -18,7 +18,7 @@ import { HttpClientModule } from '@angular/common/http';
 @NgModule({
   declarations: [
     AppComponent,
-    SmartComponent,
+    CalendarComponent,
     ListComponent,
     DatePickerComponent,
     SvgIconComponent,

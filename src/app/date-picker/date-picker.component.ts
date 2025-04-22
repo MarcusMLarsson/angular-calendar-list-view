@@ -24,8 +24,7 @@ export class DatePickerComponent {
   @Input() currentWeekDays!: Array<{ date: Date; dayNumber: number }>;
   @Input() groupedEventsByDate: { dateLabel: Date; events: CalendarEvent[] }[] =
     [];
-  @Input() selectedDate = new Date();
-
+  @Input() datePickerReferenceDate = new Date();
   @Output() changeStep = new EventEmitter<{
     step: 'next' | 'previous';
     dayPickerViewMode: 'week' | 'month';
@@ -106,7 +105,7 @@ export class DatePickerComponent {
       return;
     }
 
-    this.selectedDate = date;
+    this.viewDate = date;
     this.calendarListStateService.setDayPickerSelectedDate(date);
 
     if (!this.isSameMonth(date) && this.dayPickerViewMode === 'month') {
@@ -224,9 +223,7 @@ export class DatePickerComponent {
     ) {
       this.dayPickerViewMode = 'week';
       this.viewModeChange.emit(this.dayPickerViewMode);
-      this.currentWeekDays = this.datePickerService.getWeekDays(
-        this.selectedDate
-      );
+      this.currentWeekDays = this.datePickerService.getWeekDays(this.viewDate);
     }
   }
 

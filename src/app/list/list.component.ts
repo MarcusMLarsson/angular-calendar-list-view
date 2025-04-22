@@ -27,22 +27,23 @@ export class ListComponent {
    *  Emits the event when clicking on an event in the list view
    *  For example, you can use this event to open a dialog with event details.
    */
-  @Output() bookingClicked = new EventEmitter<CalendarBooking>();
+  @Output() eventClicked = new EventEmitter<any>();
 
-  @Output() noEventsClicked = new EventEmitter<Date>();
+  @Output() noEventClick = new EventEmitter<Date>();
 
   @Input() groupedEventsByDate!: {
     dateLabel: Date;
     events: CalendarEvent[];
   }[];
 
-  onEventClick(booking: CalendarBooking): void {
-    this.bookingClicked.emit(booking);
+  /* CalendarBooking */
+  onEventClick(booking: any): void {
+    this.eventClicked.emit(booking);
   }
 
-  onNoEventsClick(dateLabel: string): void {
+  onNoEventClick(dateLabel: Date): void {
     const date = new Date(dateLabel);
-    this.noEventsClicked.emit(date);
+    this.noEventClick.emit(date);
   }
 
   colors = colors;

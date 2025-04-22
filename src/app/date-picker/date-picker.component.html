@@ -9,7 +9,7 @@
           </div>
           <div
             class="day-of-the-week"
-            [class.selected]="day.date | isSelectedDay : selectedDate"
+            [class.selected]="day.date | isSelectedDay : viewDate"
             [class.today]="
               isToday(day.date) && !(day.date | isSelectedDay : viewDate)
             "
@@ -56,11 +56,13 @@
         >
           <div
             class="day-of-the-month"
-            [class.selected]="day.date | isSelectedDay : selectedDate"
+            [class.selected]="day.date | isSelectedDay : viewDate"
             [class.today]="
               isToday(day.date) && !(day.date | isSelectedDay : viewDate)
             "
-            [class.other-month]="!(day.date | isSameMonth : viewDate)"
+            [class.other-month]="
+              !(day.date | isSameMonth : datePickerReferenceDate)
+            "
           >
             <div class="day-content">
               <div class="first-day-of-month" *ngIf="day.dayNumber === 1">

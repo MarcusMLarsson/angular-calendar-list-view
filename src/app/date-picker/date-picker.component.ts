@@ -97,6 +97,7 @@ export class DatePickerComponent {
     );
   }
 
+  /* (touchend) is used in template instead of (click) to prevent ~300ms delay on mobile  */
   onDateClick(date: Date): void {
     if (
       this.swipeDistanceX > this.swipeThreshold ||
@@ -172,33 +173,15 @@ export class DatePickerComponent {
       const dateElements = this.el.nativeElement.querySelectorAll(
         '.day-of-the-week, .day-of-the-month'
       );
-      const selectedElement = this.el.nativeElement.querySelector('.selected');
-      const todayElement = this.el.nativeElement.querySelector('.today');
+
       dateElements.forEach((el: HTMLElement) => {
         el.classList.add(direction === 'next' ? 'slide-left' : 'slide-right');
       });
-
-      // Apply fade-out animation to selected and today elements so they don't flicker
-      if (selectedElement) {
-        selectedElement.classList.add('fade-out');
-      }
-
-      if (todayElement) {
-        todayElement.classList.add('fade-out');
-      }
 
       setTimeout(() => {
         dateElements.forEach((el: HTMLElement) =>
           el.classList.remove('slide-left', 'slide-right')
         );
-
-        if (selectedElement) {
-          selectedElement.classList.remove('fade-out');
-        }
-
-        if (todayElement) {
-          todayElement.classList.remove('fade-out');
-        }
 
         if (direction === 'next') {
           this.goToNextStep(this.dayPickerViewMode);

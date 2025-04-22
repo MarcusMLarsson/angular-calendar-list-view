@@ -87,8 +87,8 @@
   align-items: center;
   justify-content: center;
   border-radius: 50%;
-  width: 38px;
-  height: 38px;
+  width: 40px;
+  height: 40px;
   aspect-ratio: 1;
   font-size: 16px;
 }
@@ -101,7 +101,7 @@
   font-size: 16px;
   flex-direction: column;
   position: relative;
-  height: 38px;
+  height: 40px;
 }
 
 .day-content {
@@ -172,8 +172,8 @@
 
 .day-of-the-month.today {
   border-radius: 50%;
-  width: 38px;
-  height: 38px;
+  width: 40px;
+  height: 40px;
   aspect-ratio: 1;
   display: flex;
   align-items: center;
@@ -223,8 +223,8 @@
 }
 
 .booking-indicator {
-  width: 6px;
-  height: 6px;
+  width: 5px;
+  height: 5px;
   background-color: #ffb347;
   border-radius: 50%;
   pointer-events: none;
@@ -233,8 +233,8 @@
 
 .plus-indicator {
   position: relative;
-  width: 6px;
-  height: 6px;
+  width: 5px;
+  height: 5px;
   flex-shrink: 0;
 
   &::before,

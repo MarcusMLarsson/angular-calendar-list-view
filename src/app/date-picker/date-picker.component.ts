@@ -86,13 +86,6 @@ export class DatePickerComponent {
     return { dots, showPlus };
   }
 
-  toggleView() {
-    this.dayPickerViewMode =
-      this.dayPickerViewMode === 'week' ? 'month' : 'week';
-    this.viewModeChange.emit(this.dayPickerViewMode);
-    this.currentMonthDays = this.datePickerService.generateMonth(this.viewDate);
-  }
-
   isSameMonth(date: Date): boolean {
     return date.getMonth() === this.viewDate.getMonth();
   }
@@ -231,6 +224,9 @@ export class DatePickerComponent {
     ) {
       this.dayPickerViewMode = 'week';
       this.viewModeChange.emit(this.dayPickerViewMode);
+      this.currentWeekDays = this.datePickerService.getWeekDays(
+        this.selectedDate
+      );
     }
   }
 

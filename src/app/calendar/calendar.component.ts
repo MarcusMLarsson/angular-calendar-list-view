@@ -5,6 +5,7 @@ import {
   SimpleChanges,
   OnChanges,
   OnInit,
+  AfterViewInit,
 } from '@angular/core';
 import { CalendarListStateService } from '../service/calendar-list-state.service';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
@@ -13,15 +14,13 @@ import { DatePipe } from '@angular/common';
 import { EventGroupingService } from '../service/event-grouping.service';
 import { DatePickerService } from '../service/date-picker.service';
 import { ConfigService } from '../service/config.service';
-import { parse } from 'date-fns';
-import { sv } from 'date-fns/locale';
 
 @Component({
-  selector: 'app-smart',
-  templateUrl: './smart.component.html',
-  styleUrls: ['./smart.component.scss'],
+  selector: 'app-calendar',
+  templateUrl: './calendar.component.html',
+  styleUrls: ['./calendar.component.scss'],
 })
-export class SmartComponent implements OnChanges, OnInit {
+export class SmartComponent implements OnChanges, OnInit, AfterViewInit {
   /**
    * The current view date
    */
@@ -100,6 +99,10 @@ export class SmartComponent implements OnChanges, OnInit {
         this.viewDate
       );
     }
+  }
+
+  ngAfterViewInit(): void {
+    this.scrollToSelectedDate();
   }
 
   initializeSubscriptions(): void {

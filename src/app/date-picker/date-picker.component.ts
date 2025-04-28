@@ -76,15 +76,6 @@ export class DatePickerComponent {
     return date.toISOString().split('T')[0];
   }
 
-  getIndicatorDisplay(date: Date): { dots: number[]; showPlus: boolean } {
-    const bookingCount = this.dayHasBooking(date); // assuming this returns a number
-
-    const dots = Array(Math.min(bookingCount, 2)).fill(0);
-    const showPlus = bookingCount > 2;
-
-    return { dots, showPlus };
-  }
-
   isSameMonth(date: Date): boolean {
     return date.getMonth() === this.viewDate.getMonth();
   }

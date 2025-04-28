@@ -14,6 +14,7 @@ import { ScrollingModule } from '@angular/cdk/scrolling';
 import { IsSameMonthPipe } from './pipes/is-same-month/is-same-month.pipe';
 import { SvgIconComponent } from './svg-icon/svg-icon.component';
 import { HttpClientModule } from '@angular/common/http';
+import { BookingIndicatorsComponent } from './date-picker/booking-indicator.component';
 
 @NgModule({
   declarations: [
@@ -21,6 +22,7 @@ import { HttpClientModule } from '@angular/common/http';
     CalendarComponent,
     ListComponent,
     DatePickerComponent,
+    BookingIndicatorsComponent,
     SvgIconComponent,
     IsSelectedDayPipe,
     IsSameMonthPipe,

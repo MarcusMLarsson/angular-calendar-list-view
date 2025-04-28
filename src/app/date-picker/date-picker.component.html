@@ -1,4 +1,4 @@
-<div class="calendar-container" #calendar>
+<div class="calendar-container">
   <!-- Week view -->
   <ng-container *ngIf="dayPickerViewMode === 'week'">
     <div class="week-container">
@@ -16,23 +16,12 @@
             (touchend)="onDateClick(day.date)"
           >
             <div class="day-content">
-              <div class="first-day-of-month" *ngIf="day.dayNumber === 1">
-                {{ day.date | date : "MMM" }}
-              </div>
               <div>
                 {{ day.dayNumber }}
               </div>
-              <div class="booking-indicators">
-                <ng-container
-                  *ngFor="let _ of getIndicatorDisplay(day.date).dots"
-                >
-                  <div class="booking-indicator"></div>
-                </ng-container>
-                <div
-                  class="plus-indicator"
-                  *ngIf="getIndicatorDisplay(day.date).showPlus"
-                ></div>
-              </div>
+              <app-booking-indicators
+                [bookingCount]="dayHasBooking(day.date)"
+              ></app-booking-indicators>
             </div>
           </div>
         </div>
@@ -65,23 +54,12 @@
             "
           >
             <div class="day-content">
-              <div class="first-day-of-month" *ngIf="day.dayNumber === 1">
-                {{ day.date | date : "MMM" }}
-              </div>
               <div>
                 {{ day.dayNumber }}
               </div>
-              <div class="booking-indicators">
-                <ng-container
-                  *ngFor="let _ of getIndicatorDisplay(day.date).dots"
-                >
-                  <div class="booking-indicator"></div>
-                </ng-container>
-                <div
-                  class="plus-indicator"
-                  *ngIf="getIndicatorDisplay(day.date).showPlus"
-                ></div>
-              </div>
+              <app-booking-indicators
+                [bookingCount]="dayHasBooking(day.date)"
+              ></app-booking-indicators>
             </div>
           </div>
         </div>

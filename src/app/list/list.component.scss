@@ -40,6 +40,18 @@
   align-items: flex-start;
 }
 
+/* extended white background without affecting the border positioning*/
+.calendar-list-view .date-header-container::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: -15px;
+  right: -15px;
+  bottom: 0;
+  background-color: #fff;
+  z-index: -1;
+}
+
 .calendar-list-view .date-header-container .date-header {
   font-weight: 500;
   margin-right: 11px;

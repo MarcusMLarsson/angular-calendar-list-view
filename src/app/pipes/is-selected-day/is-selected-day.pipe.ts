@@ -10,7 +10,6 @@ export class IsSelectedDayPipe implements PipeTransform {
   private lastResult: boolean = false;
 
   transform(date: Date, selectedDate: Date): boolean {
-    //console.log('IsSelectedDayPipe', date, selectedDate);
     if (!date || !selectedDate) return false;
 
     const dateTime = date.getTime();

@@ -1,5 +1,4 @@
 import { Injectable } from '@angular/core';
-import { CalendarListStateService } from './calendar-list-state.service';
 import { CalendarEvent } from '../utils/utils';
 
 @Injectable({
@@ -18,18 +17,35 @@ export class EventGroupingService {
     events: CalendarEvent[],
     viewDate: Date
   ): { dateLabel: Date; events: CalendarEvent[] }[] {
-    // Generate labels for the entire year based on viewDate
     const labels = this.generateYearlyLabels(viewDate);
 
-    // Map labels to their corresponding events
+    const eventsByDateKey = new Map<string, CalendarEvent[]>();
+
+    for (const event of events) {
+      const dateKey = this.getDateKey(event.start);
+      if (!eventsByDateKey.has(dateKey)) {
+        eventsByDateKey.set(dateKey, []);
+      }
+      eventsByDateKey.get(dateKey)!.push(event);
+    }
+
     return labels.map((label) => ({
       dateLabel: label,
-      events: events.filter((event) => this.isSameDay(event.start, label)),
+      events: eventsByDateKey.get(this.getDateKey(label)) || [],
     }));
   }
 
   /**
+   * Generate a unique string key for a date (YYYY-MM-DD format)
+   * More efficient than comparing date objects
+   */
+  private getDateKey(date: Date): string {
+    return `${date.getFullYear()}-${date.getMonth()}-${date.getDate()}`;
+  }
+
+  /**
    * Check if two dates are on the same day
+   * Kept for backward compatibility, but getDateKey is more efficient
    */
   private isSameDay(date1: Date, date2: Date): boolean {
     return (
@@ -47,11 +63,20 @@ export class EventGroupingService {
   private generateYearlyLabels(viewDate: Date): Date[] {
     const year = viewDate.getFullYear();
     const labels: Date[] = [];
-    const currentDate = new Date(year, 0, 1); // Start from January 1st
 
-    while (currentDate.getFullYear() === year) {
-      labels.push(new Date(currentDate));
-      currentDate.setDate(currentDate.getDate() + 1);
+    // More efficient: calculate total days and pre-allocate array
+    const isLeapYear = (year % 4 === 0 && year % 100 !== 0) || year % 400 === 0;
+    const totalDays = isLeapYear ? 366 : 365;
+
+    // Pre-allocate array for better performance
+    labels.length = totalDays;
+
+    const startDate = new Date(year, 0, 1);
+
+    for (let i = 0; i < totalDays; i++) {
+      const currentDate = new Date(startDate);
+      currentDate.setDate(startDate.getDate() + i);
+      labels[i] = currentDate;
     }
 
     return labels;

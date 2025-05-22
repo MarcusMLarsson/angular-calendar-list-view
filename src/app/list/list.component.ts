@@ -36,6 +36,9 @@ export class ListComponent {
     events: CalendarEvent[];
   }[];
 
+  today: Date;
+  tomorrow: Date;
+
   /* CalendarBooking */
   onEventClick(booking: any): void {
     this.eventClicked.emit(booking);
@@ -48,4 +51,10 @@ export class ListComponent {
 
   colors = colors;
   bookingStatus = BookingStatus;
+
+  constructor() {
+    this.today = new Date();
+    this.tomorrow = new Date();
+    this.tomorrow.setDate(this.today.getDate() + 1);
+  }
 }

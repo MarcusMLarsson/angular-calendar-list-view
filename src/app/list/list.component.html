@@ -10,9 +10,15 @@
         {{ eventGroup.dateLabel | date : "d MMM" : "Europe/Stockholm" }}
       </span>
 
+      @if(eventGroup.dateLabel.toDateString() == today.toDateString()) {
+      <span class="date-sub-header">Today</span>
+      } @else if (eventGroup.dateLabel.toDateString() ==
+      tomorrow.toDateString()) {
+      <span class="date-sub-header">Tomorrow</span>
+      } @else {
       <span class="date-sub-header">
-        {{ eventGroup.dateLabel | date : "EEEE" : "Europe/Stockholm" }}
-      </span>
+        {{ eventGroup.dateLabel | date : "EEEE" : "Europe/Stockholm" }} </span
+      >}
     </div>
 
     <!-- No event for period -->

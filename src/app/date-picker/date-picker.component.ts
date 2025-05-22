@@ -9,7 +9,7 @@ import {
 } from '@angular/core';
 import { DatePipe } from '@angular/common';
 import { DatePickerService } from '../service/date-picker.service';
-import { events, CalendarEvent } from '../utils/utils';
+import { CalendarEvent } from '../utils/utils';
 import { CalendarListStateService } from '../service/calendar-list-state.service';
 
 @Component({
@@ -32,7 +32,7 @@ export class DatePickerComponent {
 
   @Output() viewModeChange = new EventEmitter<'week' | 'month'>();
 
-  bookedDatesMap: Map<string, any[]> = new Map();
+  bookedDatesMap: Map<string, CalendarEvent[]> = new Map();
   dayPickerViewMode: 'week' | 'month' = 'week';
   weekStartsOn = 1;
   today = new Date();
@@ -76,10 +76,6 @@ export class DatePickerComponent {
     return date.toISOString().split('T')[0];
   }
 
-  isSameMonth(date: Date): boolean {
-    return date.getMonth() === this.viewDate.getMonth();
-  }
-
   isToday(date: Date): boolean {
     return (
       date.getDate() === this.today.getDate() &&
@@ -90,6 +86,7 @@ export class DatePickerComponent {
 
   /* (touchend) is used in template instead of (click) to prevent ~300ms delay on mobile  */
   onDateClick(date: Date): void {
+    /* differentiate between a click and a swipe */
     if (
       this.swipeDistanceX > this.swipeThreshold ||
       this.swipeDistanceY > this.swipeThreshold
@@ -99,14 +96,6 @@ export class DatePickerComponent {
 
     this.viewDate = date;
     this.calendarListStateService.setDayPickerSelectedDate(date);
-
-    if (!this.isSameMonth(date) && this.dayPickerViewMode === 'month') {
-      if (date.getDate() < 15) {
-        this.goToNextStep(this.dayPickerViewMode);
-      } else {
-        this.goToPreviousStep(this.dayPickerViewMode);
-      }
-    }
   }
 
   goToPreviousStep(dayPickerViewMode: 'week' | 'month'): void {

@@ -29,6 +29,9 @@ export class ListComponent {
    */
   @Output() eventClicked = new EventEmitter<any>();
 
+  /**
+   *  Emits the date when clicking on an date with no event in the list view
+   */
   @Output() noEventClick = new EventEmitter<Date>();
 
   @Input() groupedEventsByDate!: {
@@ -39,7 +42,6 @@ export class ListComponent {
   today: Date;
   tomorrow: Date;
 
-  /* CalendarBooking */
   onEventClick(booking: any): void {
     this.eventClicked.emit(booking);
   }
